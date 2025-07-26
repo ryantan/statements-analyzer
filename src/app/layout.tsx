@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 // To make antd v5 support react 19
+import '@ant-design/v5-patch-for-react-19';
 
 import './globals.css';
 
