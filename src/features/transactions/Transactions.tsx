@@ -1,5 +1,7 @@
 'use client';
 
+import { useCategories } from '@/features/category/useCategories';
+import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
 import { Transaction } from '@/features/transactions/types';
 
 import { useEffect, useState } from 'react';
@@ -21,6 +23,7 @@ import {
   Space,
   Statistic,
   Table,
+  Tag,
   Typography,
   message,
 } from 'antd';
@@ -29,6 +32,7 @@ const { Title, Paragraph } = Typography;
 const { Search } = Input;
 
 export function TransactionsPage() {
+  const { categories, setCategories, loadFromLocalStorage } = useCategories();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<
     Transaction[]
@@ -59,6 +63,16 @@ export function TransactionsPage() {
       setFilteredTransactions(filtered);
     }
   }, [transactions, searchText]);
+
+  const saveTransactionsToLocalStorage = (items: Transaction[]) => {
+    try {
+      localStorage.setItem('transactions', JSON.stringify(items));
+      message.success('Saved transactions to localStorage');
+    } catch (error) {
+      console.error('Error saving transactions to localStorage:', error);
+      message.error('Failed to save transactions to localStorage');
+    }
+  };
 
   const loadTransactionsFromStorage = () => {
     setLoading(true);
@@ -92,6 +106,11 @@ export function TransactionsPage() {
     setFilteredTransactions([]);
     setSearchText('');
     message.success('All transactions cleared from localStorage');
+  };
+
+  const handleAssignCategories = () => {
+    const newTransactions = assignCommonCategories(transactions);
+    saveTransactionsToLocalStorage(newTransactions);
   };
 
   const handleDownloadJSON = () => {
@@ -140,6 +159,21 @@ export function TransactionsPage() {
           ))}
         </div>
       ),
+    },
+    {
+      title: 'Category',
+      dataIndex: 'categoryKey',
+      width: 120,
+      render: (categoryKey: string | null) => {
+        if (!categoryKey) {
+          return <span>-</span>;
+        }
+        const category = categories.find((c) => c.key === categoryKey);
+        if (!category) {
+          return <span>({categoryKey} not found)</span>;
+        }
+        return <Tag color={category.color}>{category.name}</Tag>;
+      },
     },
     {
       title: 'Amount',
@@ -250,6 +284,13 @@ export function TransactionsPage() {
               disabled={transactions.length === 0}
             >
               Export JSON
+            </Button>
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={handleAssignCategories}
+              disabled={transactions.length === 0}
+            >
+              Assign categories
             </Button>
             <Popconfirm
               title="Clear all transactions"
