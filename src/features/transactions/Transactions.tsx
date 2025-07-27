@@ -10,6 +10,7 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   ReloadOutlined,
+  SaveOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import {
@@ -131,6 +132,10 @@ export function TransactionsPage() {
     linkElement.click();
 
     message.success('Transactions downloaded successfully!');
+  };
+
+  const handleOverwriteLocalStorage = () => {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
   };
 
   const handleSearch = (value: string) => {
@@ -285,6 +290,15 @@ export function TransactionsPage() {
             >
               Export JSON
             </Button>
+            <Popconfirm
+              title="Confirm overwrite"
+              description="Are you sure to replace contents in localStorage?"
+              onConfirm={handleOverwriteLocalStorage}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button icon={<SaveOutlined />}>Overwrite localStorage</Button>
+            </Popconfirm>
             <Button
               icon={<DownloadOutlined />}
               onClick={handleAssignCategories}
