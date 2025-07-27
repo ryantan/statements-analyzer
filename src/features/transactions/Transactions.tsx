@@ -1,6 +1,7 @@
 'use client';
 
 import { useCategories } from '@/features/category/useCategories';
+import { CategoryCell } from '@/features/transactions/CategoryCell';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
 import {
   Transaction,
@@ -29,7 +30,6 @@ import {
   Statistic,
   Switch,
   Table,
-  Tag,
   Typography,
   message,
 } from 'antd';
@@ -38,7 +38,7 @@ const { Title, Paragraph } = Typography;
 const { Search } = Input;
 
 export function TransactionsPage() {
-  const { categories, setCategories, loadFromLocalStorage } = useCategories();
+  const { categories } = useCategories();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -145,6 +145,19 @@ export function TransactionsPage() {
     setTransactions(newTransactions);
   };
 
+  const handleCategoryChange = (
+    transactionKey: string,
+    categoryKey: string | undefined
+  ) => {
+    const updatedTransactions = transactions.map((transaction) =>
+      transaction.key === transactionKey
+        ? { ...transaction, categoryKey }
+        : transaction
+    );
+    saveTransactionsToLocalStorage(updatedTransactions);
+    setTransactions(updatedTransactions);
+  };
+
   const handleDownloadJSON = () => {
     if (transactions.length === 0) {
       message.error('No transactions to download!');
@@ -199,17 +212,14 @@ export function TransactionsPage() {
     {
       title: 'Category',
       dataIndex: 'categoryKey',
-      width: 120,
-      render: (categoryKey: string | null) => {
-        if (!categoryKey) {
-          return <span>-</span>;
-        }
-        const category = categories.find((c) => c.key === categoryKey);
-        if (!category) {
-          return <span>({categoryKey} not found)</span>;
-        }
-        return <Tag color={category.color}>{category.name}</Tag>;
-      },
+      width: 150,
+      render: (categoryKey: string | null, record: TransactionDisplayItem) => (
+        <CategoryCell
+          transaction={record}
+          categories={categories}
+          onCategoryChange={handleCategoryChange}
+        />
+      ),
     },
     {
       title: 'Amount',
