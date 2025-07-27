@@ -101,17 +101,20 @@ export function TransactionsPage() {
     }
   };
 
-  const handleClearStorage = () => {
-    localStorage.removeItem('transactions');
-    setTransactions([]);
-    setFilteredTransactions([]);
-    setSearchText('');
-    message.success('All transactions cleared from localStorage');
+  const handleClearCategories = () => {
+    const newTransactions = transactions.map((transaction) => ({
+      ...transaction,
+      autoCategoryKey: undefined,
+    }));
+    saveTransactionsToLocalStorage(newTransactions);
+    setTransactions(newTransactions);
+    message.success('Auto-assigned categories removed from all transactions.');
   };
 
   const handleAssignCategories = () => {
     const newTransactions = assignCommonCategories(transactions);
     saveTransactionsToLocalStorage(newTransactions);
+    setTransactions(newTransactions);
   };
 
   const handleDownloadJSON = () => {
@@ -135,7 +138,7 @@ export function TransactionsPage() {
   };
 
   const handleOverwriteLocalStorage = () => {
-    localStorage.setItem('transactions', JSON.stringify(transactions));
+    saveTransactionsToLocalStorage(transactions);
   };
 
   const handleSearch = (value: string) => {
@@ -246,10 +249,10 @@ export function TransactionsPage() {
         <Col xs={24} sm={8}>
           <Card>
             <Statistic
-              title="Income vs Expenses"
-              value={positiveAmount + negativeAmount}
-              precision={2}
-              prefix="$"
+              title="To be categorized"
+              value={transactions.filter((t) => !t.categoryKey).length}
+              precision={0}
+              prefix=""
               valueStyle={{ color: '#1890ff' }}
             />
           </Card>
@@ -307,9 +310,9 @@ export function TransactionsPage() {
               Assign categories
             </Button>
             <Popconfirm
-              title="Clear all transactions"
-              description="Are you sure you want to delete all transactions from localStorage? This action cannot be undone."
-              onConfirm={handleClearStorage}
+              title="Clear all auto-assigned categories"
+              description="Are you sure you want to delete all auto-assigned categories from transactions? This action cannot be undone."
+              onConfirm={handleClearCategories}
               okText="Yes"
               cancelText="No"
               disabled={transactions.length === 0}
@@ -319,7 +322,7 @@ export function TransactionsPage() {
                 danger
                 disabled={transactions.length === 0}
               >
-                Clear All
+                Clear assigned categories
               </Button>
             </Popconfirm>
           </Space>
