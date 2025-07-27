@@ -5,6 +5,7 @@ import { AntdRegistry } from '@ant-design/nextjs-registry';
 // To make antd v5 support react 19
 import '@ant-design/v5-patch-for-react-19';
 
+import Navigation from '@/components/navigation';
 import './globals.css';
 
 const geistSans = Geist({
@@ -32,7 +33,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AntdRegistry>{children}</AntdRegistry>
+        <AntdRegistry>
+          <Navigation />
+          {children}
+        </AntdRegistry>
       </body>
     </html>
   );
