@@ -1,7 +1,7 @@
 'use client';
 
 import { Category } from '@/features/category/types';
-import { Transaction } from '@/features/transactions/types';
+import { TransactionDisplayItem } from '@/features/transactions/types';
 
 import { useState } from 'react';
 
@@ -9,11 +9,11 @@ import { EditOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Tag } from 'antd';
 
 interface CategoryCellProps {
-  transaction: Transaction;
+  transaction: TransactionDisplayItem;
   categories: Category[];
   onCategoryChange: (
-    transactionKey: number,
-    categoryKey: string | null
+    transactionKey: string,
+    categoryKey: string | undefined
   ) => void;
 }
 
@@ -24,14 +24,14 @@ export function CategoryCell({
 }: CategoryCellProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  const currentCategory = transaction.categoryKey
-    ? categories.find((c) => c.key === transaction.categoryKey)
+  const currentCategory = transaction.resolvedCategoryKey
+    ? categories.find((c) => c.key === transaction.resolvedCategoryKey)
     : null;
 
   const handleCategorySelect = (categoryKey: string) => {
     onCategoryChange(
       transaction.key,
-      categoryKey === 'none' ? null : categoryKey
+      categoryKey === 'none' ? undefined : categoryKey
     );
   };
 

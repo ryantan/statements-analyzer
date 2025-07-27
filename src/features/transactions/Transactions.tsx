@@ -147,7 +147,7 @@ export function TransactionsPage() {
 
   const handleCategoryChange = (
     transactionKey: string,
-    categoryKey: string | null
+    categoryKey: string | undefined
   ) => {
     const updatedTransactions = transactions.map((transaction) =>
       transaction.key === transactionKey
