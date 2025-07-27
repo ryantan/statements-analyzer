@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { AppstoreOutlined, UploadOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, UploadOutlined, HistoryOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Flex, Row, Typography } from 'antd';
 
 const { Title, Paragraph } = Typography;
@@ -40,6 +40,33 @@ export const Home = () => {
               <Link href="/upload">
                 <Button type="primary" size="large">
                   Get Started
+                </Button>
+              </Link>
+            </Flex>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Card hoverable>
+            <Flex
+              align="center"
+              gap={16}
+              vertical
+              style={{ textAlign: 'center' }}
+            >
+              <HistoryOutlined
+                style={{
+                  fontSize: '48px',
+                  color: '#52c41a',
+                  marginBottom: '16px',
+                }}
+              />
+              <Title level={3}>View Transactions</Title>
+              <Paragraph>
+                Browse and manage your stored transaction history
+              </Paragraph>
+              <Link href="/transactions">
+                <Button type="primary" size="large">
+                  View History
                 </Button>
               </Link>
             </Flex>

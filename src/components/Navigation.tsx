@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu } from 'antd';
-import { UploadOutlined, AppstoreOutlined, HomeOutlined } from '@ant-design/icons';
+import { UploadOutlined, AppstoreOutlined, HomeOutlined, HistoryOutlined } from '@ant-design/icons';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -18,6 +18,8 @@ export function Navigation() {
       setSelectedKey('upload');
     } else if (pathname === '/categories') {
       setSelectedKey('categories');
+    } else if (pathname === '/transactions') {
+      setSelectedKey('transactions');
     }
   }, [pathname]);
 
@@ -33,6 +35,12 @@ export function Navigation() {
       icon: <UploadOutlined />,
       label: 'Upload',
       onClick: () => router.push('/upload'),
+    },
+    {
+      key: 'transactions',
+      icon: <HistoryOutlined />,
+      label: 'Transactions',
+      onClick: () => router.push('/transactions'),
     },
     {
       key: 'categories',
