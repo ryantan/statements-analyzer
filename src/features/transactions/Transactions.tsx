@@ -2,13 +2,17 @@
 
 import { useCategories } from '@/features/category/useCategories';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
-import { Transaction } from '@/features/transactions/types';
+import {
+  Transaction,
+  TransactionDisplayItem,
+} from '@/features/transactions/types';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   DeleteOutlined,
   DownloadOutlined,
+  FilterOutlined,
   ReloadOutlined,
   SaveOutlined,
   SearchOutlined,
@@ -23,6 +27,7 @@ import {
   Row,
   Space,
   Statistic,
+  Switch,
   Table,
   Tag,
   Typography,
@@ -35,35 +40,60 @@ const { Search } = Input;
 export function TransactionsPage() {
   const { categories, setCategories, loadFromLocalStorage } = useCategories();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<
-    Transaction[]
-  >([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [showOnlyUncategorized, setShowOnlyUncategorized] = useState(false);
 
   // Load transactions from localStorage on component mount
   useEffect(() => {
     loadTransactionsFromStorage();
   }, []);
 
-  // Filter transactions when search text changes
-  useEffect(() => {
-    if (!searchText.trim()) {
-      setFilteredTransactions(transactions);
-    } else {
-      const filtered = transactions.filter(
+  // Filter transactions when search text or uncategorized filter changes
+  const processedTransactions = useMemo(() => {
+    return transactions
+      .filter(
         (transaction) =>
-          transaction.description.some((desc) =>
-            desc.toLowerCase().includes(searchText.toLowerCase())
-          ) ||
-          transaction.dateFormatted
-            .toLowerCase()
-            .includes(searchText.toLowerCase()) ||
-          transaction.amountFormatted.includes(searchText)
+          !transaction.description
+            .join(' ')
+            .toUpperCase()
+            .includes('FAST INCOMING PAYMENT')
+      )
+      .map<TransactionDisplayItem>((transaction) => ({
+        ...transaction,
+        resolvedCategoryKey:
+          transaction.categoryKey || transaction.autoCategoryKey,
+        searchText: [
+          transaction.description.join(' '),
+          transaction.dateFormatted,
+          transaction.amount,
+        ]
+          .join('|')
+          .toUpperCase(),
+      }));
+  }, [transactions]);
+
+  // Filter transactions when search text or uncategorized filter changes
+  const filteredTransactions = useMemo(() => {
+    let filtered = [...processedTransactions];
+
+    // Apply search filter
+    const searchTextProcessed = searchText?.trim()?.toUpperCase() || '';
+    if (searchTextProcessed) {
+      filtered = filtered.filter((transaction) =>
+        transaction.searchText.includes(searchTextProcessed)
       );
-      setFilteredTransactions(filtered);
     }
-  }, [transactions, searchText]);
+
+    // Apply uncategorized filter
+    if (showOnlyUncategorized) {
+      filtered = filtered.filter(
+        (transaction) => !transaction.resolvedCategoryKey
+      );
+    }
+
+    return filtered;
+  }, [processedTransactions, searchText, showOnlyUncategorized]);
 
   const saveTransactionsToLocalStorage = (items: Transaction[]) => {
     try {
@@ -82,20 +112,17 @@ export function TransactionsPage() {
       if (storedTransactions) {
         const parsedTransactions = JSON.parse(storedTransactions);
         setTransactions(parsedTransactions);
-        setFilteredTransactions(parsedTransactions);
         message.success(
           `Loaded ${parsedTransactions.length} transactions from storage`
         );
       } else {
         setTransactions([]);
-        setFilteredTransactions([]);
         message.info('No transactions found in localStorage');
       }
     } catch (error) {
       console.error('Error loading transactions:', error);
       message.error('Failed to load transactions from localStorage');
       setTransactions([]);
-      setFilteredTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -111,6 +138,7 @@ export function TransactionsPage() {
     message.success('Auto-assigned categories removed from all transactions.');
   };
 
+  // Auto-assigns categories.
   const handleAssignCategories = () => {
     const newTransactions = assignCommonCategories(transactions);
     saveTransactionsToLocalStorage(newTransactions);
@@ -230,7 +258,7 @@ export function TransactionsPage() {
           <Card>
             <Statistic
               title="Total Transactions"
-              value={transactions.length}
+              value={processedTransactions.length}
               prefix={<SearchOutlined />}
             />
           </Card>
@@ -238,8 +266,8 @@ export function TransactionsPage() {
         <Col xs={24} sm={8}>
           <Card>
             <Statistic
-              title="Net Balance"
-              value={totalAmount}
+              title="Net expense"
+              value={-1 * totalAmount}
               precision={2}
               prefix="$"
               valueStyle={{ color: totalAmount >= 0 ? '#3f8600' : '#cf1322' }}
@@ -250,7 +278,10 @@ export function TransactionsPage() {
           <Card>
             <Statistic
               title="To be categorized"
-              value={transactions.filter((t) => !t.categoryKey).length}
+              value={
+                processedTransactions.filter((t) => !t.resolvedCategoryKey)
+                  .length
+              }
               precision={0}
               prefix=""
               valueStyle={{ color: '#1890ff' }}
@@ -270,14 +301,25 @@ export function TransactionsPage() {
             gap: '8px',
           }}
         >
-          <Search
-            placeholder="Search transactions by description, date, or amount..."
-            allowClear
-            onSearch={handleSearch}
-            style={{ width: 400, minWidth: 300 }}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Search
+              placeholder="Search transactions by description, date, or amount..."
+              allowClear
+              onSearch={handleSearch}
+              style={{ width: 400, minWidth: 300 }}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FilterOutlined />
+              <span>Show only uncategorized:</span>
+              <Switch
+                checked={showOnlyUncategorized}
+                onChange={setShowOnlyUncategorized}
+                size="small"
+              />
+            </div>
+          </div>
           <Space>
             <Button
               icon={<ReloadOutlined />}
