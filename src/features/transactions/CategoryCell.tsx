@@ -77,6 +77,7 @@ export function CategoryCell({
           menu={{
             items: dropdownItems,
             onClick: ({ key }) => handleCategorySelect(key),
+            style: { maxHeight: 300 },
           }}
           trigger={['click']}
           placement="bottomLeft"
