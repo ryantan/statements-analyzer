@@ -3,6 +3,7 @@
 import { useCategories } from '@/features/category/useCategories';
 import { CategoryCell } from '@/features/transactions/CategoryCell';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
+import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import {
   Transaction,
   TransactionDisplayItem,
@@ -67,6 +68,7 @@ export function TransactionsPage() {
           transaction.description.join(' '),
           transaction.dateFormatted,
           transaction.amount,
+          transaction.remarks || '',
         ]
           .join('|')
           .toUpperCase(),
@@ -158,6 +160,19 @@ export function TransactionsPage() {
     setTransactions(updatedTransactions);
   };
 
+  const handleRemarksChange = (
+    transactionKey: string,
+    remarks: string | undefined
+  ) => {
+    const updatedTransactions = transactions.map((transaction) =>
+      transaction.key === transactionKey
+        ? { ...transaction, remarks }
+        : transaction
+    );
+    saveTransactionsToLocalStorage(updatedTransactions);
+    setTransactions(updatedTransactions);
+  };
+
   const handleDownloadJSON = () => {
     if (transactions.length === 0) {
       message.error('No transactions to download!');
@@ -218,6 +233,19 @@ export function TransactionsPage() {
           transaction={record}
           categories={categories}
           onCategoryChange={handleCategoryChange}
+        />
+      ),
+    },
+    {
+      title: 'Remarks',
+      dataIndex: 'remarks',
+      key: 'remarks',
+      width: 250,
+      render: (remarks: string | undefined, record: TransactionDisplayItem) => (
+        <RemarksCell
+          remarks={remarks}
+          transactionKey={record.key}
+          onRemarksChange={handleRemarksChange}
         />
       ),
     },
@@ -390,7 +418,7 @@ export function TransactionsPage() {
             showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} transactions`,
           }}
-          scroll={{ x: 800 }}
+          scroll={{ x: 1000 }}
           loading={loading}
           locale={{
             emptyText: (
