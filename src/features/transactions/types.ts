@@ -2,6 +2,7 @@ export type Transaction = {
   key: string;
   day: string;
   month: string;
+  year: number;
   date: Date;
   dateFormatted: string;
   description: string[];
@@ -10,6 +11,10 @@ export type Transaction = {
   categoryKey?: string;
   autoCategoryKey?: string;
   remarks?: string;
+};
+
+export type TransactionRaw = Omit<Transaction, 'date'> & {
+  date: string;
 };
 
 export type TransactionDisplayItem = Transaction & {
