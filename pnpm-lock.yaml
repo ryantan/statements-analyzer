@@ -35,6 +35,9 @@ importers:
       pdfjs-dist:
         specifier: ^5.3.93
         version: 5.3.93
+      rc-picker:
+        specifier: ^4.11.3
+        version: 4.11.3(date-fns@4.1.0)(dayjs@1.11.13)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: 19.1.0
         version: 19.1.0
