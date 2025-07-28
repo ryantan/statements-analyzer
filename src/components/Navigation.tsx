@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu } from 'antd';
-import { UploadOutlined, AppstoreOutlined, HomeOutlined, HistoryOutlined } from '@ant-design/icons';
+import { UploadOutlined, AppstoreOutlined, HomeOutlined, HistoryOutlined, BarChartOutlined } from '@ant-design/icons';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -20,6 +20,8 @@ export function Navigation() {
       setSelectedKey('categories');
     } else if (pathname === '/transactions') {
       setSelectedKey('transactions');
+    } else if (pathname === '/stats') {
+      setSelectedKey('stats');
     }
   }, [pathname]);
 
@@ -47,6 +49,12 @@ export function Navigation() {
       icon: <AppstoreOutlined />,
       label: 'Categories',
       onClick: () => router.push('/categories'),
+    },
+    {
+      key: 'stats',
+      icon: <BarChartOutlined />,
+      label: 'Statistics',
+      onClick: () => router.push('/stats'),
     },
   ];
 
