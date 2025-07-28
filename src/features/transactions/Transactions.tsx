@@ -7,6 +7,7 @@ import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import {
   Transaction,
   TransactionDisplayItem,
+  TransactionRaw,
 } from '@/features/transactions/types';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -34,6 +35,8 @@ import {
   Typography,
   message,
 } from 'antd';
+import { ColumnsType } from 'antd/es/table';
+import { parseJSON } from 'date-fns';
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
@@ -112,7 +115,13 @@ export function TransactionsPage() {
     try {
       const storedTransactions = localStorage.getItem('transactions');
       if (storedTransactions) {
-        const parsedTransactions = JSON.parse(storedTransactions);
+        const rawTransactions = JSON.parse(
+          storedTransactions
+        ) as TransactionRaw[];
+        const parsedTransactions = rawTransactions.map((item) => {
+          const date = parseJSON(item.date);
+          return { ...item, date } as Transaction;
+        });
         setTransactions(parsedTransactions);
         message.success(
           `Loaded ${parsedTransactions.length} transactions from storage`
@@ -201,13 +210,15 @@ export function TransactionsPage() {
     setSearchText(value);
   };
 
-  const columns = [
+  const columns: ColumnsType<TransactionDisplayItem> = [
     {
       title: 'Date',
       dataIndex: 'dateFormatted',
       key: 'date',
       width: 100,
-      sorter: (a: Transaction, b: Transaction) =>
+      defaultSortOrder: 'descend',
+      sortDirections: ['descend', 'ascend'],
+      sorter: (a: TransactionDisplayItem, b: TransactionDisplayItem) =>
         a.date.getTime() - b.date.getTime(),
     },
     {
@@ -255,7 +266,7 @@ export function TransactionsPage() {
       key: 'amount',
       width: 120,
       align: 'right' as const,
-      sorter: (a: Transaction, b: Transaction) => a.amount - b.amount,
+      sorter: (a, b) => a.amount - b.amount,
       render: (amount: number) => (
         <span
           style={{
@@ -408,7 +419,7 @@ export function TransactionsPage() {
           </Space>
         </div>
 
-        <Table
+        <Table<TransactionDisplayItem>
           columns={columns}
           dataSource={filteredTransactions}
           pagination={{
