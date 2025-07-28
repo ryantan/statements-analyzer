@@ -8,6 +8,10 @@ import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import { TransactionDisplayItem } from '@/features/transactions/types';
 import { useTransactions } from '@/features/transactions/useTransactions';
 import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
+import {
+  isClaimable,
+  isNotClaimable,
+} from '@/features/transactions/utils/isNotClaimable';
 
 import { useMemo, useState } from 'react';
 
@@ -119,13 +123,9 @@ export function TransactionsPage() {
     // Apply claimable filter
     if (claimableFilter && claimableFilter !== '') {
       if (claimableFilter === 'claimable') {
-        filtered = filtered.filter(
-          (transaction) => transaction.claimable === true
-        );
+        filtered = filtered.filter(isClaimable);
       } else if (claimableFilter === 'not-claimable') {
-        filtered = filtered.filter(
-          (transaction) => transaction.claimable !== true
-        );
+        filtered = filtered.filter(isNotClaimable);
       }
     }
 

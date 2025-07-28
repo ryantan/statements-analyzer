@@ -3,6 +3,7 @@
 import { useCategories } from '@/features/category/useCategories';
 import { useTransactions } from '@/features/transactions/useTransactions';
 import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
+import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
 
 import { useMemo, useState } from 'react';
 
@@ -17,6 +18,7 @@ import {
   Table,
   Tag,
   Typography,
+  Modal,
 } from 'antd';
 import { format } from 'date-fns';
 import {
@@ -46,6 +48,8 @@ export function StatsPage() {
     new Date().getFullYear()
   );
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   // Get unique years from transactions
   const availableYears = useMemo(() => {
@@ -57,6 +61,7 @@ export function StatsPage() {
   const processedTransactions = useMemo(() => {
     return transactions
       .filter(isNotCCPayments)
+      .filter(isNotClaimable)
       .map<TransactionForStats>((item) => {
         const categoryKey = item.categoryKey || item.autoCategoryKey;
         if (!categoryKey) {
@@ -161,6 +166,18 @@ export function StatsPage() {
   const totalExpense = filteredTransactions
     .reduce((sum, t) => sum + t.amount, 0)
     .toFixed(2);
+
+  // Get transactions for selected category
+  const selectedCategoryTransactions = useMemo(() => {
+    if (!selectedCategory) return [];
+    return filteredTransactions.filter(t => t.parentCategoryKey === selectedCategory);
+  }, [filteredTransactions, selectedCategory]);
+
+  // Handle pie chart click
+  const handlePieClick = (data: PieData) => {
+    setSelectedCategory(data.key);
+    setIsModalVisible(true);
+  };
 
   // Render a custom tooltip for bar chart displaying total and number of transactions.
   const renderBarTooltip: TooltipProps<any, any>['content'] = (props) => {
@@ -320,7 +337,7 @@ export function StatsPage() {
           </Card>
         </Col>
         <Col xs={24}>
-          <Card title="Category Distribution (Ring Chart)">
+          <Card title="Category Distribution (Ring Chart) - Click to drill down">
             <ResponsiveContainer width="100%" height={600}>
               <PieChart>
                 <Pie
@@ -335,6 +352,7 @@ export function StatsPage() {
                   innerRadius={180}
                   fill="#8884d8"
                   dataKey="value"
+                  onClick={handlePieClick}
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -409,6 +427,85 @@ export function StatsPage() {
           rowKey="categoryKey"
         />
       </Card>
+
+      {/* Drill-down Modal */}
+      <Modal
+        title={`Transactions for ${selectedCategory ? categoryMap.get(selectedCategory)?.name || 'Unknown' : ''}`}
+        open={isModalVisible}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setSelectedCategory(null);
+        }}
+        footer={null}
+        width={1000}
+      >
+        <Table
+          dataSource={selectedCategoryTransactions}
+          columns={[
+            {
+              title: 'Date',
+              dataIndex: 'date',
+              key: 'date',
+              render: (date: Date) => format(date, 'MMM dd, yyyy'),
+              sorter: (a: TransactionForStats, b: TransactionForStats) => 
+                a.date.getTime() - b.date.getTime(),
+            },
+            {
+              title: 'Description',
+              dataIndex: 'description',
+              key: 'description',
+              render: (description: string[]) => description.join(' '),
+              ellipsis: true,
+            },
+            {
+              title: 'Amount',
+              dataIndex: 'amount',
+              key: 'amount',
+              render: (amount: number) => (
+                <span
+                  style={{
+                    color: amount >= 0 ? 'green' : 'red',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  ${amount.toFixed(2)}
+                </span>
+              ),
+              sorter: (a: TransactionForStats, b: TransactionForStats) => a.amount - b.amount,
+            },
+            {
+              title: 'Category',
+              dataIndex: 'categoryKey',
+              key: 'categoryKey',
+              render: (categoryKey: string | undefined, record: TransactionForStats) => {
+                const key = categoryKey || record.autoCategoryKey;
+                const category = categoryMap.get(key || '');
+                return category ? (
+                  <Tag color={category.color}>{category.name}</Tag>
+                ) : (
+                  <Tag>Unknown</Tag>
+                );
+              },
+            },
+            {
+              title: 'Remarks',
+              dataIndex: 'remarks',
+              key: 'remarks',
+              render: (remarks: string | undefined) => remarks || '-',
+              ellipsis: true,
+            },
+          ]}
+          pagination={{
+            pageSize: 20,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => 
+              `${range[0]}-${range[1]} of ${total} transactions`,
+          }}
+          rowKey="key"
+          scroll={{ x: 800 }}
+        />
+      </Modal>
     </div>
   );
 }
