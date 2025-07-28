@@ -4,13 +4,10 @@ import { useCategories } from '@/features/category/useCategories';
 import { CategoryCell } from '@/features/transactions/CategoryCell';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
 import { RemarksCell } from '@/features/transactions/components/RemarksCell';
-import {
-  Transaction,
-  TransactionDisplayItem,
-  TransactionRaw,
-} from '@/features/transactions/types';
+import { TransactionDisplayItem } from '@/features/transactions/types';
+import { useTransactions } from '@/features/transactions/useTransactions';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   DeleteOutlined,
@@ -36,22 +33,16 @@ import {
   message,
 } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { parseJSON } from 'date-fns';
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
 
 export function TransactionsPage() {
   const { categories } = useCategories();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { transactions, setTransactions, loadFromLocalStorage, loading } =
+    useTransactions();
   const [searchText, setSearchText] = useState('');
   const [showOnlyUncategorized, setShowOnlyUncategorized] = useState(false);
-
-  // Load transactions from localStorage on component mount
-  useEffect(() => {
-    loadTransactionsFromStorage();
-  }, []);
 
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
@@ -100,51 +91,11 @@ export function TransactionsPage() {
     return filtered;
   }, [processedTransactions, searchText, showOnlyUncategorized]);
 
-  const saveTransactionsToLocalStorage = (items: Transaction[]) => {
-    try {
-      localStorage.setItem('transactions', JSON.stringify(items));
-      message.success('Saved transactions to localStorage');
-    } catch (error) {
-      console.error('Error saving transactions to localStorage:', error);
-      message.error('Failed to save transactions to localStorage');
-    }
-  };
-
-  const loadTransactionsFromStorage = () => {
-    setLoading(true);
-    try {
-      const storedTransactions = localStorage.getItem('transactions');
-      if (storedTransactions) {
-        const rawTransactions = JSON.parse(
-          storedTransactions
-        ) as TransactionRaw[];
-        const parsedTransactions = rawTransactions.map((item) => {
-          const date = parseJSON(item.date);
-          return { ...item, date } as Transaction;
-        });
-        setTransactions(parsedTransactions);
-        message.success(
-          `Loaded ${parsedTransactions.length} transactions from storage`
-        );
-      } else {
-        setTransactions([]);
-        message.info('No transactions found in localStorage');
-      }
-    } catch (error) {
-      console.error('Error loading transactions:', error);
-      message.error('Failed to load transactions from localStorage');
-      setTransactions([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleClearCategories = () => {
     const newTransactions = transactions.map((transaction) => ({
       ...transaction,
       autoCategoryKey: undefined,
     }));
-    saveTransactionsToLocalStorage(newTransactions);
     setTransactions(newTransactions);
     message.success('Auto-assigned categories removed from all transactions.');
   };
@@ -152,7 +103,6 @@ export function TransactionsPage() {
   // Auto-assigns categories.
   const handleAssignCategories = () => {
     const newTransactions = assignCommonCategories(transactions);
-    saveTransactionsToLocalStorage(newTransactions);
     setTransactions(newTransactions);
   };
 
@@ -165,7 +115,6 @@ export function TransactionsPage() {
         ? { ...transaction, categoryKey }
         : transaction
     );
-    saveTransactionsToLocalStorage(updatedTransactions);
     setTransactions(updatedTransactions);
   };
 
@@ -178,7 +127,6 @@ export function TransactionsPage() {
         ? { ...transaction, remarks }
         : transaction
     );
-    saveTransactionsToLocalStorage(updatedTransactions);
     setTransactions(updatedTransactions);
   };
 
@@ -203,7 +151,7 @@ export function TransactionsPage() {
   };
 
   const handleOverwriteLocalStorage = () => {
-    saveTransactionsToLocalStorage(transactions);
+    setTransactions(transactions);
   };
 
   const handleSearch = (value: string) => {
@@ -372,7 +320,7 @@ export function TransactionsPage() {
           <Space>
             <Button
               icon={<ReloadOutlined />}
-              onClick={loadTransactionsFromStorage}
+              onClick={loadFromLocalStorage}
               loading={loading}
             >
               Refresh
@@ -437,7 +385,7 @@ export function TransactionsPage() {
                 description={
                   <span>
                     No transactions found.{' '}
-                    <Button type="link" onClick={loadTransactionsFromStorage}>
+                    <Button type="link" onClick={loadFromLocalStorage}>
                       Refresh
                     </Button>{' '}
                     or upload some transactions first.
