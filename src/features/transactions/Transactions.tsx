@@ -6,6 +6,7 @@ import { assignCommonCategories } from '@/features/transactions/assignCommonCate
 import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import { TransactionDisplayItem } from '@/features/transactions/types';
 import { useTransactions } from '@/features/transactions/useTransactions';
+import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
 
 import { useMemo, useState } from 'react';
 
@@ -47,13 +48,7 @@ export function TransactionsPage() {
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
     return transactions
-      .filter(
-        (transaction) =>
-          !transaction.description
-            .join(' ')
-            .toUpperCase()
-            .includes('FAST INCOMING PAYMENT')
-      )
+      .filter(isNotCCPayments)
       .map<TransactionDisplayItem>((transaction) => ({
         ...transaction,
         resolvedCategoryKey:
