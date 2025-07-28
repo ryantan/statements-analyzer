@@ -13,6 +13,8 @@ import { useMemo, useState } from 'react';
 
 import {
   CalendarOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
   DeleteOutlined,
   DownloadOutlined,
   FilterOutlined,
@@ -34,6 +36,7 @@ import {
   Statistic,
   Switch,
   Table,
+  Tooltip,
   Typography,
   message,
 } from 'antd';
@@ -49,11 +52,12 @@ export function TransactionsPage() {
   const { transactions, setTransactions, loadFromLocalStorage, loading } =
     useTransactions();
   const [searchText, setSearchText] = useState('');
-  const [showOnlyUncategorized, setShowOnlyUncategorized] = useState(false);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
   );
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [claimableFilter, setClaimableFilter] =
+    useState<string>('not-claimable');
 
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
@@ -112,15 +116,27 @@ export function TransactionsPage() {
       }
     }
 
-    // Apply uncategorized filter
-    if (showOnlyUncategorized) {
-      filtered = filtered.filter(
-        (transaction) => !transaction.resolvedCategoryKey
-      );
+    // Apply claimable filter
+    if (claimableFilter && claimableFilter !== '') {
+      if (claimableFilter === 'claimable') {
+        filtered = filtered.filter(
+          (transaction) => transaction.claimable === true
+        );
+      } else if (claimableFilter === 'not-claimable') {
+        filtered = filtered.filter(
+          (transaction) => transaction.claimable !== true
+        );
+      }
     }
 
     return filtered;
-  }, [processedTransactions, searchText, showOnlyUncategorized, dateRange, selectedCategory]);
+  }, [
+    processedTransactions,
+    searchText,
+    dateRange,
+    selectedCategory,
+    claimableFilter,
+  ]);
 
   const handleClearCategories = () => {
     const newTransactions = transactions.map((transaction) => ({
@@ -156,6 +172,18 @@ export function TransactionsPage() {
     const updatedTransactions = transactions.map((transaction) =>
       transaction.key === transactionKey
         ? { ...transaction, remarks }
+        : transaction
+    );
+    setTransactions(updatedTransactions);
+  };
+
+  const handleClaimableChange = (
+    transactionKey: string,
+    claimable: boolean
+  ) => {
+    const updatedTransactions = transactions.map((transaction) =>
+      transaction.key === transactionKey
+        ? { ...transaction, claimable }
         : transaction
     );
     setTransactions(updatedTransactions);
@@ -240,6 +268,34 @@ export function TransactionsPage() {
       ),
     },
     {
+      title: 'Claimable',
+      dataIndex: 'claimable',
+      key: 'claimable',
+      width: 100,
+      align: 'center' as const,
+      render: (
+        claimable: boolean | undefined,
+        record: TransactionDisplayItem
+      ) => (
+        <Tooltip
+          title={claimable ? 'Mark as not claimable' : 'Mark as claimable'}
+        >
+          <Button
+            type="text"
+            icon={
+              claimable ? (
+                <CheckCircleOutlined style={{ color: '#52c41a' }} />
+              ) : (
+                <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
+              )
+            }
+            onClick={() => handleClaimableChange(record.key, !claimable)}
+            style={{ padding: '4px' }}
+          />
+        </Tooltip>
+      ),
+    },
+    {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
@@ -282,7 +338,7 @@ export function TransactionsPage() {
 
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Total Transactions"
@@ -291,7 +347,7 @@ export function TransactionsPage() {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Net expense"
@@ -302,7 +358,7 @@ export function TransactionsPage() {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="To be categorized"
@@ -313,6 +369,19 @@ export function TransactionsPage() {
               precision={0}
               prefix=""
               valueStyle={{ color: '#1890ff' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Statistic
+              title="Claimable transactions"
+              value={
+                processedTransactions.filter((t) => t.claimable === true).length
+              }
+              precision={0}
+              prefix={<CheckCircleOutlined />}
+              valueStyle={{ color: '#52c41a' }}
             />
           </Card>
         </Col>
@@ -371,7 +440,13 @@ export function TransactionsPage() {
                   ...categories.map((category) => ({
                     value: category.key,
                     label: (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
                         <div
                           style={{
                             width: '12px',
@@ -388,12 +463,19 @@ export function TransactionsPage() {
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FilterOutlined />
-              <span>Show only uncategorized:</span>
-              <Switch
-                checked={showOnlyUncategorized}
-                onChange={setShowOnlyUncategorized}
-                size="small"
+              <CheckCircleOutlined />
+              <span>Claimable:</span>
+              <Select
+                placeholder="Filter by claimable status"
+                value={claimableFilter}
+                onChange={setClaimableFilter}
+                style={{ width: 180 }}
+                allowClear
+                options={[
+                  { value: '', label: 'All transactions' },
+                  { value: 'claimable', label: 'Claimable' },
+                  { value: 'not-claimable', label: 'Not claimable' },
+                ]}
               />
             </div>
           </div>

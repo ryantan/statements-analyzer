@@ -11,6 +11,7 @@ export type Transaction = {
   categoryKey?: string;
   autoCategoryKey?: string;
   remarks?: string;
+  claimable?: boolean;
 };
 
 export type TransactionRaw = Omit<Transaction, 'date'> & {
