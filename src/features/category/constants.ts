@@ -2,6 +2,12 @@ import { Category } from './types';
 
 export const defaultCategories: Category[] = [
   {
+    key: 'unknown',
+    name: 'Unknown',
+    description: 'Unknown',
+    color: '#858585',
+  },
+  {
     key: 'rent',
     name: 'Rent',
     description: 'Rental',
@@ -17,6 +23,12 @@ export const defaultCategories: Category[] = [
     key: 'groceries-bread',
     name: 'Groceries (Bread)',
     description: 'Bread',
+    color: '#52c41a',
+  },
+  {
+    key: 'household',
+    name: 'Household',
+    description: 'Household',
     color: '#52c41a',
   },
   {
@@ -251,6 +263,12 @@ export const defaultCategories: Category[] = [
     key: 'interest',
     name: 'Interest',
     description: 'Interest on loans, etc.',
+    color: '#bc0d0d',
+  },
+  {
+    key: 'others',
+    name: 'Others',
+    description: 'Others',
     color: '#bc0d0d',
   },
   {
