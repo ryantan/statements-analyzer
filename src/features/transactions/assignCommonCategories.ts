@@ -310,11 +310,11 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
     } else if (descriptionAll.includes('WORLD OF PAWS')) {
       newCategoryKey = 'entertainment-playground';
     } else if (descriptionAll.includes('WALKINGONSUNSHINE')) {
-      newCategoryKey = 'entertainment';
+      newCategoryKey = 'entertainment-others';
     } else if (descriptionAll.includes('CLAYFUL.SG')) {
-      newCategoryKey = 'entertainment';
+      newCategoryKey = 'entertainment-others';
     } else if (descriptionAll.includes('FEVER*CANDLELIGHT')) {
-      newCategoryKey = 'entertainment';
+      newCategoryKey = 'entertainment-others';
     } else if (descriptionAll.includes('AMAZON WEB SERVICES')) {
       newCategoryKey = 'software';
     } else if (descriptionAll.includes('SPOTIFY')) {
@@ -362,9 +362,9 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       // Butcher box
       newCategoryKey = 'party';
     } else if (descriptionAll.includes('AGODA.COM')) {
-      newCategoryKey = 'holiday';
+      newCategoryKey = 'holiday-accom';
     } else if (descriptionAll.includes('KAIDE SINGAPORE')) {
-      newCategoryKey = 'holiday';
+      newCategoryKey = 'holiday-others';
     } else if (descriptionAll.includes('FLYSCOOT')) {
       newCategoryKey = 'holiday-flights';
     } else if (descriptionAll.includes('MILES TRANSFER FEE')) {
@@ -428,9 +428,9 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
     } else if (descriptionAll.includes('INTEREST')) {
       newCategoryKey = 'interest';
     } else if (descriptionAll.includes('FOREIGN AMOUNT')) {
-      newCategoryKey = 'holiday';
+      newCategoryKey = 'holiday-others';
     } else if (descriptionAll.includes('CCY CONVERSION FEE')) {
-      newCategoryKey = 'holiday';
+      newCategoryKey = 'holiday-others';
     }
     return { ...item, autoCategoryKey: newCategoryKey };
   });
