@@ -19,6 +19,7 @@ import {
   ReloadOutlined,
   SaveOutlined,
   SearchOutlined,
+  TagOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -28,6 +29,7 @@ import {
   Input,
   Popconfirm,
   Row,
+  Select,
   Space,
   Statistic,
   Switch,
@@ -51,6 +53,7 @@ export function TransactionsPage() {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
   );
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
@@ -71,7 +74,7 @@ export function TransactionsPage() {
       }));
   }, [transactions]);
 
-  // Filter transactions when search text, uncategorized filter, or date range changes
+  // Filter transactions when search text, uncategorized filter, date range, or category changes
   const filteredTransactions = useMemo(() => {
     let filtered = [...processedTransactions];
 
@@ -96,6 +99,13 @@ export function TransactionsPage() {
       });
     }
 
+    // Apply category filter
+    if (selectedCategory && selectedCategory !== '') {
+      filtered = filtered.filter(
+        (transaction) => transaction.resolvedCategoryKey === selectedCategory
+      );
+    }
+
     // Apply uncategorized filter
     if (showOnlyUncategorized) {
       filtered = filtered.filter(
@@ -104,7 +114,7 @@ export function TransactionsPage() {
     }
 
     return filtered;
-  }, [processedTransactions, searchText, showOnlyUncategorized, dateRange]);
+  }, [processedTransactions, searchText, showOnlyUncategorized, dateRange, selectedCategory]);
 
   const handleClearCategories = () => {
     const newTransactions = transactions.map((transaction) => ({
@@ -338,6 +348,36 @@ export function TransactionsPage() {
                 placeholder={['Start date', 'End date']}
                 style={{ width: 240 }}
                 allowClear
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <TagOutlined />
+              <span>Category:</span>
+              <Select
+                placeholder="Select category"
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                style={{ width: 200 }}
+                allowClear
+                options={[
+                  { value: '', label: 'All categories' },
+                  ...categories.map((category) => ({
+                    value: category.key,
+                    label: (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div
+                          style={{
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            backgroundColor: category.color,
+                          }}
+                        />
+                        {category.name}
+                      </div>
+                    ),
+                  })),
+                ]}
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
