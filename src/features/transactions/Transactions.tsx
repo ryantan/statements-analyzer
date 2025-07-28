@@ -1,5 +1,6 @@
 'use client';
 
+import { DatePicker } from '@/components';
 import { useCategories } from '@/features/category/useCategories';
 import { CategoryCell } from '@/features/transactions/CategoryCell';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
@@ -11,6 +12,7 @@ import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
 import { useMemo, useState } from 'react';
 
 import {
+  CalendarOutlined,
   DeleteOutlined,
   DownloadOutlined,
   FilterOutlined,
@@ -34,9 +36,11 @@ import {
   message,
 } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import { endOfDay, isAfter, isBefore, startOfDay } from 'date-fns';
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
+const { RangePicker } = DatePicker;
 
 export function TransactionsPage() {
   const { categories } = useCategories();
@@ -44,6 +48,9 @@ export function TransactionsPage() {
     useTransactions();
   const [searchText, setSearchText] = useState('');
   const [showOnlyUncategorized, setShowOnlyUncategorized] = useState(false);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
+    null
+  );
 
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
@@ -64,7 +71,7 @@ export function TransactionsPage() {
       }));
   }, [transactions]);
 
-  // Filter transactions when search text or uncategorized filter changes
+  // Filter transactions when search text, uncategorized filter, or date range changes
   const filteredTransactions = useMemo(() => {
     let filtered = [...processedTransactions];
 
@@ -76,6 +83,19 @@ export function TransactionsPage() {
       );
     }
 
+    // Apply date range filter
+    if (dateRange && dateRange[0] && dateRange[1]) {
+      const startDate = startOfDay(dateRange[0]);
+      const endDate = endOfDay(dateRange[1]);
+      filtered = filtered.filter((transaction) => {
+        const transactionDate = transaction.date;
+        return (
+          isAfter(transactionDate, startDate) &&
+          isBefore(transactionDate, endDate)
+        );
+      });
+    }
+
     // Apply uncategorized filter
     if (showOnlyUncategorized) {
       filtered = filtered.filter(
@@ -84,7 +104,7 @@ export function TransactionsPage() {
     }
 
     return filtered;
-  }, [processedTransactions, searchText, showOnlyUncategorized]);
+  }, [processedTransactions, searchText, showOnlyUncategorized, dateRange]);
 
   const handleClearCategories = () => {
     const newTransactions = transactions.map((transaction) => ({
@@ -293,7 +313,14 @@ export function TransactionsPage() {
             gap: '8px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              flexWrap: 'wrap',
+            }}
+          >
             <Search
               placeholder="Search transactions by description, date, or amount..."
               allowClear
@@ -302,6 +329,17 @@ export function TransactionsPage() {
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CalendarOutlined />
+              <span>Date range:</span>
+              <RangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                placeholder={['Start date', 'End date']}
+                style={{ width: 240 }}
+                allowClear
+              />
+            </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FilterOutlined />
               <span>Show only uncategorized:</span>
