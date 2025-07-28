@@ -44,6 +44,12 @@ export const defaultCategories: Category[] = [
     color: '#7a3213',
   },
   {
+    key: 'food',
+    name: 'Food',
+    description: 'Food',
+    color: '#52c41a',
+  },
+  {
     key: 'food-eating-out',
     name: 'Food (Eating Out)',
     description: 'Eating out',
@@ -68,6 +74,12 @@ export const defaultCategories: Category[] = [
     color: '#52c41a',
   },
   {
+    key: 'transport',
+    name: 'Transport',
+    description: 'Transport',
+    color: '#1890ff',
+  },
+  {
     key: 'transport-public',
     name: 'Transport (Public)',
     description: 'Bus / MRT',
@@ -86,6 +98,12 @@ export const defaultCategories: Category[] = [
     color: '#1890ff',
   },
   {
+    key: 'education',
+    name: 'Education',
+    description: 'Courses, books, etc. for adults and kids',
+    color: '#a229aa',
+  },
+  {
     key: 'education-adults',
     name: 'Education (Adults)',
     description: 'Courses, books, etc. for adults',
@@ -100,7 +118,7 @@ export const defaultCategories: Category[] = [
   {
     key: 'entertainment',
     name: 'Entertainment',
-    description: 'Non-movie entertainment',
+    description: 'Entertainment',
     color: '#722ed1',
   },
   {
@@ -116,10 +134,22 @@ export const defaultCategories: Category[] = [
     color: '#722ed1',
   },
   {
+    key: 'entertainment-others',
+    name: 'Entertainment (Others)',
+    description: 'Other entertainment',
+    color: '#722ed1',
+  },
+  {
     key: 'kids-toys-books',
     name: 'Toys and books (Kids)',
     description: 'Toys, books, etc. for kids.',
     color: '#ff84fd',
+  },
+  {
+    key: 'shopping',
+    name: 'Shopping',
+    description: 'All shopping',
+    color: '#02efe8',
   },
   {
     key: 'shopping-beauty',
@@ -164,9 +194,21 @@ export const defaultCategories: Category[] = [
     color: '#d3bc28',
   },
   {
+    key: 'holiday-accom',
+    name: 'Holiday expenses (Accommodation)',
+    description: 'Accommodation',
+    color: '#d3bc28',
+  },
+  {
     key: 'holiday-flights',
     name: 'Holiday expenses (Flights)',
     description: 'Flights',
+    color: '#d3bc28',
+  },
+  {
+    key: 'holiday-others',
+    name: 'Holiday expenses (Others)',
+    description: 'Other expenditure during holidays',
     color: '#d3bc28',
   },
   {
