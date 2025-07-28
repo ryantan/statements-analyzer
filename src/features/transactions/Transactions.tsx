@@ -101,9 +101,15 @@ export function TransactionsPage() {
 
     // Apply category filter
     if (selectedCategory && selectedCategory !== '') {
-      filtered = filtered.filter(
-        (transaction) => transaction.resolvedCategoryKey === selectedCategory
-      );
+      if (selectedCategory === 'unassigned') {
+        filtered = filtered.filter(
+          (transaction) => !transaction.resolvedCategoryKey
+        );
+      } else {
+        filtered = filtered.filter(
+          (transaction) => transaction.resolvedCategoryKey === selectedCategory
+        );
+      }
     }
 
     // Apply uncategorized filter
@@ -361,6 +367,7 @@ export function TransactionsPage() {
                 allowClear
                 options={[
                   { value: '', label: 'All categories' },
+                  { value: 'unassigned', label: 'Unassigned' },
                   ...categories.map((category) => ({
                     value: category.key,
                     label: (
