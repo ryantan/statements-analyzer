@@ -245,12 +245,8 @@ export function TransactionsPage() {
         <RemarksCell
           remarks={remarks}
           transactionKey={record.key}
-          isEditing={remarksEditor.isEditing(record.key)}
-          tempRemarks={remarksEditor.tempRemarks}
-          onTempRemarksChange={remarksEditor.setTempRemarks}
-          onStartEdit={remarksEditor.startEditing}
+          remarksEditor={remarksEditor}
           onSave={handleRemarksSave}
-          onCancel={remarksEditor.cancelEditing}
         />
       ),
     },

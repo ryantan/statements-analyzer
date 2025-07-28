@@ -3,33 +3,35 @@
 import { Button, Input } from 'antd';
 import { CheckOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 
+interface RemarksEditor {
+  editingRemarks: string | null;
+  tempRemarks: string;
+  setTempRemarks: (value: string) => void;
+  startEditing: (transactionKey: string, currentRemarks: string) => void;
+  cancelEditing: () => void;
+  isEditing: (transactionKey: string) => boolean;
+}
+
 interface RemarksCellProps {
   remarks?: string;
   transactionKey: string;
-  isEditing: boolean;
-  tempRemarks: string;
-  onTempRemarksChange: (value: string) => void;
-  onStartEdit: (transactionKey: string, currentRemarks: string) => void;
+  remarksEditor: RemarksEditor;
   onSave: (transactionKey: string) => void;
-  onCancel: () => void;
 }
 
 export function RemarksCell({
   remarks,
   transactionKey,
-  isEditing,
-  tempRemarks,
-  onTempRemarksChange,
-  onStartEdit,
+  remarksEditor,
   onSave,
-  onCancel,
 }: RemarksCellProps) {
+  const isEditing = remarksEditor.isEditing(transactionKey);
   if (isEditing) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Input
-          value={tempRemarks}
-          onChange={(e) => onTempRemarksChange(e.target.value)}
+          value={remarksEditor.tempRemarks}
+          onChange={(e) => remarksEditor.setTempRemarks(e.target.value)}
           placeholder="Add remarks..."
           size="small"
           onPressEnter={() => onSave(transactionKey)}
@@ -46,7 +48,7 @@ export function RemarksCell({
           type="text"
           size="small"
           icon={<CloseOutlined />}
-          onClick={onCancel}
+          onClick={remarksEditor.cancelEditing}
           style={{ color: 'red' }}
         />
       </div>
@@ -62,7 +64,7 @@ export function RemarksCell({
         type="text"
         size="small"
         icon={<EditOutlined />}
-        onClick={() => onStartEdit(transactionKey, remarks || '')}
+        onClick={() => remarksEditor.startEditing(transactionKey, remarks || '')}
         style={{ opacity: 0.7 }}
       />
     </div>
