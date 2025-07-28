@@ -99,11 +99,15 @@ export const identifyTransactionItems = (
       }
 
       const date = parseDayMonth(dayItem.str, monthItem.str);
+      // TODO: Somehow derive year reliably from the statement.
+      const year = monthItem.str === 'DEC' ? 2024 : 2025;
+      date.setFullYear(year);
 
       transactions.push({
         key: uuidv4(),
         day: dayItem.str,
         month: monthItem.str,
+        year,
         date,
         dateFormatted: format(date, 'd MMM'),
         descriptionWords,
