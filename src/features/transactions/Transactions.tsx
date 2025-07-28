@@ -3,6 +3,8 @@
 import { useCategories } from '@/features/category/useCategories';
 import { CategoryCell } from '@/features/transactions/CategoryCell';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
+import { RemarksCell } from '@/features/transactions/components/RemarksCell';
+import { useRemarksEditor } from '@/features/transactions/hooks/useRemarksEditor';
 import {
   Transaction,
   TransactionDisplayItem,
@@ -11,11 +13,8 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import {
-  CheckOutlined,
-  CloseOutlined,
   DeleteOutlined,
   DownloadOutlined,
-  EditOutlined,
   FilterOutlined,
   ReloadOutlined,
   SaveOutlined,
@@ -46,8 +45,8 @@ export function TransactionsPage() {
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [showOnlyUncategorized, setShowOnlyUncategorized] = useState(false);
-  const [editingRemarks, setEditingRemarks] = useState<string | null>(null);
-  const [tempRemarks, setTempRemarks] = useState<string>('');
+  
+  const remarksEditor = useRemarksEditor();
 
   // Load transactions from localStorage on component mount
   useEffect(() => {
@@ -191,26 +190,15 @@ export function TransactionsPage() {
     setSearchText(value);
   };
 
-  const handleRemarksEdit = (transactionKey: string, currentRemarks: string) => {
-    setEditingRemarks(transactionKey);
-    setTempRemarks(currentRemarks || '');
-  };
-
   const handleRemarksSave = (transactionKey: string) => {
     const updatedTransactions = transactions.map((transaction) =>
       transaction.key === transactionKey
-        ? { ...transaction, remarks: tempRemarks }
+        ? { ...transaction, remarks: remarksEditor.tempRemarks }
         : transaction
     );
     saveTransactionsToLocalStorage(updatedTransactions);
     setTransactions(updatedTransactions);
-    setEditingRemarks(null);
-    setTempRemarks('');
-  };
-
-  const handleRemarksCancel = () => {
-    setEditingRemarks(null);
-    setTempRemarks('');
+    remarksEditor.cancelEditing();
   };
 
   const columns = [
@@ -253,53 +241,18 @@ export function TransactionsPage() {
       dataIndex: 'remarks',
       key: 'remarks',
       width: 200,
-      render: (remarks: string | undefined, record: TransactionDisplayItem) => {
-        const isEditing = editingRemarks === record.key;
-        
-        if (isEditing) {
-          return (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Input
-                value={tempRemarks}
-                onChange={(e) => setTempRemarks(e.target.value)}
-                placeholder="Add remarks..."
-                size="small"
-                onPressEnter={() => handleRemarksSave(record.key)}
-                autoFocus
-              />
-              <Button
-                type="text"
-                size="small"
-                icon={<CheckOutlined />}
-                onClick={() => handleRemarksSave(record.key)}
-                style={{ color: 'green' }}
-              />
-              <Button
-                type="text"
-                size="small"
-                icon={<CloseOutlined />}
-                onClick={handleRemarksCancel}
-                style={{ color: 'red' }}
-              />
-            </div>
-          );
-        }
-
-        return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ flex: 1, fontSize: '13px' }}>
-              {remarks || <em style={{ color: '#999' }}>No remarks</em>}
-            </span>
-            <Button
-              type="text"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => handleRemarksEdit(record.key, remarks || '')}
-              style={{ opacity: 0.7 }}
-            />
-          </div>
-        );
-      },
+      render: (remarks: string | undefined, record: TransactionDisplayItem) => (
+        <RemarksCell
+          remarks={remarks}
+          transactionKey={record.key}
+          isEditing={remarksEditor.isEditing(record.key)}
+          tempRemarks={remarksEditor.tempRemarks}
+          onTempRemarksChange={remarksEditor.setTempRemarks}
+          onStartEdit={remarksEditor.startEditing}
+          onSave={handleRemarksSave}
+          onCancel={remarksEditor.cancelEditing}
+        />
+      ),
     },
     {
       title: 'Amount',
