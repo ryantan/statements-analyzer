@@ -21,8 +21,11 @@ export const useCategories = () => {
     loadFromLocalStorage();
   }, []);
 
+  const categoryMap = new Map(categories.map((c) => [c.key, c]));
+
   return {
     categories,
+    categoryMap,
     setCategories,
     loadFromLocalStorage,
   };
