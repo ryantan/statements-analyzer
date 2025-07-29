@@ -2,6 +2,7 @@
 
 import { DatePicker } from '@/components';
 import { useCategories } from '@/features/category/useCategories';
+import { renderStackBarTooltip } from '@/features/monthly/components/renderStackBarTooltip';
 import { useCategoryFilter } from '@/features/monthly/hooks/useCategoryFilter';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
@@ -221,42 +222,6 @@ export function MonthlyExpensesPage() {
     return (total / monthlyData.length).toFixed(2);
   }, [monthlyData]);
 
-  // Custom tooltip for stacked bar chart
-  const renderTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div
-          style={{
-            backgroundColor: '#fff',
-            border: '1px solid #ccc',
-            padding: '10px',
-            borderRadius: '4px',
-          }}
-        >
-          <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p
-              key={index}
-              style={{
-                margin: '4px 0',
-                color: entry.color,
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: '20px',
-              }}
-            >
-              <span>{entry.name}:</span>
-              <span style={{ fontWeight: 'bold' }}>
-                ${Math.abs(entry.value).toFixed(2)}
-              </span>
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <div
       style={{
@@ -344,7 +309,7 @@ export function MonthlyExpensesPage() {
             <YAxis
               tickFormatter={(value) => `$${Math.abs(value).toLocaleString()}`}
             />
-            <Tooltip content={renderTooltip} />
+            <Tooltip content={renderStackBarTooltip} />
             <Legend />
             {categoryKeysLargestFirst.map((categoryKey) => (
               <Bar
@@ -370,7 +335,7 @@ export function MonthlyExpensesPage() {
             <YAxis
               tickFormatter={(value) => `$${Math.abs(value).toLocaleString()}`}
             />
-            <Tooltip content={renderTooltip} />
+            <Tooltip content={renderStackBarTooltip} />
             <Legend />
             {categoryKeysLargestFirst.map((categoryKey) => (
               <Area
@@ -399,7 +364,7 @@ export function MonthlyExpensesPage() {
             <YAxis
               tickFormatter={(value) => `$${Math.abs(value).toLocaleString()}`}
             />
-            <Tooltip content={renderTooltip} />
+            <Tooltip content={renderStackBarTooltip} />
             <Legend />
             {categoryKeysLargestFirst.map((categoryKey) => (
               <Area
