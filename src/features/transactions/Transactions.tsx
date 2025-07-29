@@ -270,6 +270,34 @@ export function TransactionsPage() {
     setTransactions(transactions);
   };
 
+  const handleSetDecemberTo2024 = () => {
+    const newTransactions = transactions.map((transaction) => {
+      const transactionDate = new Date(transaction.date);
+      if (transactionDate.getMonth() === 11) { // December is month 11 (0-indexed)
+        const newDate = new Date(transactionDate);
+        newDate.setFullYear(2024);
+        return {
+          ...transaction,
+          date: newDate,
+          dateFormatted: newDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          }),
+        };
+      }
+      return transaction;
+    });
+    
+    const decemberTransactions = newTransactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.date);
+      return transactionDate.getMonth() === 11;
+    });
+    
+    setTransactions(newTransactions);
+    message.success(`Updated ${decemberTransactions.length} December transactions to year 2024.`);
+  };
+
   const handleSearch = (value: string) => {
     setSearchText(value);
   };
@@ -450,6 +478,21 @@ export function TransactionsPage() {
               disabled={transactions.length === 0}
             >
               Clear assigned categories
+            </Button>
+          </Popconfirm>
+          <Popconfirm
+            title="Set December transactions to 2024"
+            description="This will update all transactions with December dates to year 2024. Continue?"
+            onConfirm={handleSetDecemberTo2024}
+            okText="Yes"
+            cancelText="No"
+            disabled={transactions.length === 0}
+          >
+            <Button
+              icon={<CalendarOutlined />}
+              disabled={transactions.length === 0}
+            >
+              Set December 2024
             </Button>
           </Popconfirm>
         </Space>
