@@ -12,10 +12,16 @@ export type Transaction = {
   autoCategoryKey?: string;
   remarks?: string;
   claimable?: boolean;
+  // Accounting date properties for assigning transactions to different periods
+  accountingYear?: number;
+  accountingMonth?: number;
+  accountingDay?: number;
+  accountingDate?: Date;
 };
 
-export type TransactionRaw = Omit<Transaction, 'date'> & {
+export type TransactionRaw = Omit<Transaction, 'date' | 'accountingDate'> & {
   date: string;
+  accountingDate?: string;
 };
 
 export type TransactionDisplayItem = Transaction & {

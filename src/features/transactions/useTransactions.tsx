@@ -1,8 +1,9 @@
 import { Transaction, TransactionRaw } from '@/features/transactions/types';
 
 import { useEffect, useState } from 'react';
-import { parseJSON } from 'date-fns';
+
 import { message } from 'antd';
+import { parseJSON } from 'date-fns';
 
 export const useTransactions = () => {
   const [transactions, _setTransactions] = useState<Transaction[]>([]);
@@ -24,13 +25,20 @@ export const useTransactions = () => {
     try {
       const storedTransactions = localStorage.getItem('transactions');
       if (storedTransactions) {
-        const rawTransactions = JSON.parse(storedTransactions) as TransactionRaw[];
+        const rawTransactions = JSON.parse(
+          storedTransactions
+        ) as TransactionRaw[];
         const parsedTransactions = rawTransactions.map((item) => {
           const date = parseJSON(item.date);
-          return { ...item, date } as Transaction;
+          const accountingDate = item.accountingDate
+            ? parseJSON(item.accountingDate)
+            : undefined;
+          return { ...item, date, accountingDate } as Transaction;
         });
         _setTransactions(parsedTransactions);
-        message.success(`Loaded ${parsedTransactions.length} transactions from storage`);
+        message.success(
+          `Loaded ${parsedTransactions.length} transactions from storage`
+        );
       } else {
         _setTransactions([]);
         message.info('No transactions found in localStorage');
@@ -54,4 +62,4 @@ export const useTransactions = () => {
     loadFromLocalStorage,
     loading,
   };
-}; 
+};
