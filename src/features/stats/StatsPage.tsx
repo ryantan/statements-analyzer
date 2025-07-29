@@ -1,6 +1,7 @@
 'use client';
 
 import { useCategories } from '@/features/category/useCategories';
+import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick';
 import { useTransactions } from '@/features/transactions/useTransactions';
 import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
 import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
@@ -319,7 +320,12 @@ export function StatsPage() {
               <BarChart data={pieData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" />
-                <YAxis type="category" dataKey="name" width={240} />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={128}
+                  tick={renderBarAxisTick}
+                />
                 <Tooltip content={renderBarTooltip} />
                 <Bar
                   dataKey="value"
