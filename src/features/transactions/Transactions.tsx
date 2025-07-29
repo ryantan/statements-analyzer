@@ -2,9 +2,9 @@
 
 import { DatePicker } from '@/components';
 import { useCategories } from '@/features/category/useCategories';
-import { CategoryCell } from '@/features/transactions/CategoryCell';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
+import { CategoryCell } from '@/features/transactions/components/CategoryCell';
 import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import { TransactionDisplayItem } from '@/features/transactions/types';
 import { useTransactions } from '@/features/transactions/useTransactions';
