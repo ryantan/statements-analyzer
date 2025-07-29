@@ -23,7 +23,16 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { endOfDay, format, isAfter, isBefore, startOfDay, startOfMonth, endOfMonth, parseISO } from 'date-fns';
+import {
+  endOfDay,
+  endOfMonth,
+  format,
+  isAfter,
+  isBefore,
+  parseISO,
+  startOfDay,
+  startOfMonth,
+} from 'date-fns';
 import {
   Bar,
   BarChart,
@@ -51,7 +60,9 @@ export function StatsPage() {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
   );
-  const [selectedYearMonth, setSelectedYearMonth] = useState<string | null>(null);
+  const [selectedYearMonth, setSelectedYearMonth] = useState<string | null>(
+    null
+  );
   const {
     selectedCategory,
     isModalVisible,
@@ -89,28 +100,30 @@ export function StatsPage() {
   // Extract available year-month options from data
   const availableYearMonths = useMemo(() => {
     const yearMonthSet = new Set<string>();
-    
+
     processedTransactions.forEach((transaction) => {
       const yearMonth = format(transaction.resolvedDate, 'yyyy-MM');
       yearMonthSet.add(yearMonth);
     });
-    
+
     return Array.from(yearMonthSet)
       .sort()
       .reverse() // Most recent first
-      .map(yearMonth => ({
+      .map((yearMonth) => ({
         value: yearMonth,
-        label: format(parseISO(`${yearMonth}-01`), 'MMMM yyyy')
+        label: format(parseISO(`${yearMonth}-01`), 'MMMM yyyy'),
       }));
   }, [processedTransactions]);
 
   // Handle year-month selection
   const handleYearMonthChange = (value: string | null) => {
     setSelectedYearMonth(value);
-    
+
     if (value) {
       const [year, month] = value.split('-');
-      const startDate = startOfMonth(new Date(parseInt(year), parseInt(month) - 1));
+      const startDate = startOfMonth(
+        new Date(parseInt(year), parseInt(month) - 1)
+      );
       const endDate = endOfMonth(new Date(parseInt(year), parseInt(month) - 1));
       setDateRange([startDate, endDate]);
     } else {
@@ -250,11 +263,17 @@ export function StatsPage() {
             allowClear
             showSearch
             filterOption={(input, option) =>
-              String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              String(option?.label ?? '')
+                .toLowerCase()
+                .includes(input.toLowerCase())
             }
           >
             {availableYearMonths.map((option) => (
-              <Option key={option.value} value={option.value} label={option.label}>
+              <Option
+                key={option.value}
+                value={option.value}
+                label={option.label}
+              >
                 {option.label}
               </Option>
             ))}
