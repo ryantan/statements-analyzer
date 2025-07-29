@@ -324,12 +324,6 @@ export function TransactionsPage() {
     (sum, transaction) => sum + transaction.amount,
     0
   );
-  const positiveAmount = transactions
-    .filter((t) => t.amount > 0)
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
-  const negativeAmount = transactions
-    .filter((t) => t.amount < 0)
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
