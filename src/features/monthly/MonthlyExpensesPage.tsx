@@ -258,8 +258,16 @@ export function MonthlyExpensesPage() {
   };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '24px' }}>
+    <div
+      style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 24,
+      }}
+    >
+      <div>
         <Title level={2}>Monthly Expenses Overview</Title>
         <Paragraph style={{ color: '#666' }}>
           Track your spending patterns across months with category breakdown
@@ -269,7 +277,6 @@ export function MonthlyExpensesPage() {
       {/* Date Range Selector */}
       <div
         style={{
-          marginBottom: '24px',
           display: 'flex',
           gap: '16px',
           alignItems: 'center',
@@ -291,7 +298,7 @@ export function MonthlyExpensesPage() {
       {renderCategoriesFilter()}
 
       {/* Summary Statistics */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[16, 16]}>
         <Col xs={24} sm={8}>
           <Card>
             <Statistic
@@ -409,7 +416,7 @@ export function MonthlyExpensesPage() {
       </Card>
 
       {/* Data Table */}
-      <Card title="Monthly Breakdown" style={{ marginTop: '24px' }}>
+      <Card title="Monthly Breakdown">
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
