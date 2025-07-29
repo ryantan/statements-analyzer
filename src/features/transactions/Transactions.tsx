@@ -347,6 +347,37 @@ export function TransactionsPage() {
       ),
     },
     {
+      title: 'Bank',
+      dataIndex: 'bank',
+      key: 'bank',
+      width: 120,
+      render: (bank: string | undefined) => (
+        <span style={{ fontSize: '12px', color: '#666' }}>{bank || '-'}</span>
+      ),
+    },
+    {
+      title: 'Account',
+      dataIndex: 'bankAccount',
+      key: 'bankAccount',
+      width: 120,
+      render: (bankAccount: string | undefined) => (
+        <span style={{ fontSize: '12px', color: '#666' }}>
+          {bankAccount || '-'}
+        </span>
+      ),
+    },
+    // {
+    //   title: 'File',
+    //   dataIndex: 'fileName',
+    //   key: 'fileName',
+    //   width: 150,
+    //   render: (fileName: string | undefined) => (
+    //     <span style={{ fontSize: '12px', color: '#666' }}>
+    //       {fileName || '-'}
+    //     </span>
+    //   ),
+    // },
+    {
       title: 'Category',
       dataIndex: 'categoryKey',
       width: 150,
