@@ -1,9 +1,18 @@
 'use client';
 
-import { Menu } from 'antd';
-import { UploadOutlined, AppstoreOutlined, HomeOutlined, HistoryOutlined, BarChartOutlined, CalendarOutlined } from '@ant-design/icons';
-import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+
+import { usePathname, useRouter } from 'next/navigation';
+
+import {
+  AppstoreOutlined,
+  BarChartOutlined,
+  CalendarOutlined,
+  HistoryOutlined,
+  HomeOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
+import { Menu } from 'antd';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -72,12 +81,12 @@ export function Navigation() {
         mode="horizontal"
         selectedKeys={[selectedKey]}
         items={menuItems}
-        style={{ 
-          display: 'flex', 
+        style={{
+          display: 'flex',
           justifyContent: 'flex-start',
-          padding: '0 24px'
+          padding: '0 24px',
         }}
       />
     </div>
   );
-} 
+}
