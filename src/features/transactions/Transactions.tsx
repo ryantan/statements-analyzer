@@ -28,6 +28,7 @@ import {
   SaveOutlined,
   SearchOutlined,
   TagOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -60,6 +61,7 @@ export function TransactionsPage() {
     setTransactions,
     loadTransactions,
     isLoadingTransactions,
+    loadFromFile,
   } = useTransactions();
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
@@ -264,6 +266,35 @@ export function TransactionsPage() {
     linkElement.click();
 
     message.success('Transactions downloaded successfully!');
+  };
+
+  const handleImportJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        loadFromFile(content);
+      } catch (error) {
+        message.error(
+          'Failed to parse JSON file. Please check the file format.'
+        );
+        console.error('Import error:', error);
+      }
+    };
+
+    reader.onerror = () => {
+      message.error('Failed to read the file.');
+    };
+
+    reader.readAsText(file);
+
+    // Reset the input value so the same file can be selected again
+    event.target.value = '';
   };
 
   const handleOverwriteLocalStorage = () => {
@@ -482,6 +513,21 @@ export function TransactionsPage() {
           >
             Export JSON
           </Button>
+          <Button
+            icon={<UploadOutlined />}
+            onClick={() =>
+              document.getElementById('import-json-input')?.click()
+            }
+          >
+            Import JSON
+          </Button>
+          <input
+            id="import-json-input"
+            type="file"
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={handleImportJSON}
+          />
           <Popconfirm
             title="Confirm overwrite"
             description="Are you sure to replace contents in localStorage?"
