@@ -1,8 +1,8 @@
 'use client';
 
 import { Category } from '@/features/category/types';
+import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
-import { useTransactions } from '@/features/transactions/useTransactions';
 
 import { useMemo, useState } from 'react';
 
@@ -30,7 +30,7 @@ export function DrillDownModal({
     current: 1,
     pageSize: 10,
   });
-  const { updateItem } = useTransactions();
+  const { updateTransactionItem } = useTransactions();
 
   // Get transactions for selected category
   const selectedCategoryTransactions = useMemo(() => {
@@ -61,7 +61,7 @@ export function DrillDownModal({
     transactionKey: string,
     accountingDate: Date | undefined
   ) => {
-    updateItem(transactionKey, (item) => ({
+    updateTransactionItem(transactionKey, (item) => ({
       ...item,
       accountingDate,
       accountingYear: accountingDate ? accountingDate.getFullYear() : undefined,
