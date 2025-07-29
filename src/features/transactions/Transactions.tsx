@@ -406,15 +406,16 @@ export function TransactionsPage() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '16px',
+              gap: '12px',
               flexWrap: 'wrap',
+              flex: 1,
             }}
           >
             <Search
               placeholder="Search transactions by description, date, or amount..."
               allowClear
               onSearch={handleSearch}
-              style={{ width: 400, minWidth: 300 }}
+              style={{ width: '100%', maxWidth: 400, minWidth: 250 }}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
@@ -425,7 +426,7 @@ export function TransactionsPage() {
                 value={dateRange}
                 onChange={setDateRange}
                 placeholder={['Start date', 'End date']}
-                style={{ width: 240 }}
+                style={{ width: '100%', maxWidth: 240, minWidth: 200 }}
                 allowClear
               />
             </div>
@@ -436,7 +437,7 @@ export function TransactionsPage() {
                 placeholder="Select category"
                 value={selectedCategory}
                 onChange={setSelectedCategory}
-                style={{ width: 200 }}
+                style={{ width: '100%', maxWidth: 200, minWidth: 150 }}
                 allowClear
                 options={[
                   { value: '', label: 'All categories' },
@@ -473,7 +474,7 @@ export function TransactionsPage() {
                 placeholder="Filter by claimable status"
                 value={claimableFilter}
                 onChange={setClaimableFilter}
-                style={{ width: 180 }}
+                style={{ width: '100%', maxWidth: 180, minWidth: 140 }}
                 allowClear
                 options={[
                   { value: '', label: 'All transactions' },
@@ -550,7 +551,7 @@ export function TransactionsPage() {
               });
             },
           }}
-          scroll={{ x: 1000 }}
+          scroll={{ x: 'max-content' }}
           loading={loading}
           locale={{
             emptyText: (
