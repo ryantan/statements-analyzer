@@ -54,6 +54,7 @@ export function StatsPage() {
     isModalVisible,
     handleBarClick,
     handlePieClick,
+    openModalForCategory,
     closeModal,
   } = useDrillDown();
   const [pagination, setPagination] = useState({
@@ -134,6 +135,7 @@ export function StatsPage() {
       stats.push({
         categoryKey,
         categoryName: categoryMap.get(categoryKey)?.name || 'Unknown',
+        color: categoryMap.get(categoryKey)?.color || '',
         total,
         transactionCount: transactions.length,
         averageAmount: total / transactions.length,
@@ -300,7 +302,7 @@ export function StatsPage() {
               dataIndex: 'categoryName',
               key: 'categoryName',
               render: (name: string, record: CategoryStats) => (
-                <Tag color={record.total > 0 ? 'green' : 'red'}>{name}</Tag>
+                <Tag color={record.color}>{name}</Tag>
               ),
             },
             {
@@ -317,6 +319,7 @@ export function StatsPage() {
                   ${amount.toFixed(2)}
                 </span>
               ),
+              sortOrder: 'descend',
               sorter: (a: CategoryStats, b: CategoryStats) => a.total - b.total,
             },
             {
@@ -343,7 +346,13 @@ export function StatsPage() {
               dataIndex: 'categoryName',
               render: (_categoryName, record: CategoryStats) => (
                 <Space>
-                  <Button>View details</Button>
+                  <Button
+                    onClick={() => {
+                      openModalForCategory(record.categoryKey);
+                    }}
+                  >
+                    View details
+                  </Button>
                 </Space>
               ),
             },
