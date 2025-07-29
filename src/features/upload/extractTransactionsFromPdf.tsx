@@ -12,7 +12,10 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
 const removeIntermediateProperties = (
-  transaction: TransactionItem
+  transaction: TransactionItem,
+  bank?: string,
+  bankAccount?: string,
+  fileName?: string
 ): Transaction => {
   const requiredProps = pick(transaction, [
     'key',
@@ -27,12 +30,18 @@ const removeIntermediateProperties = (
 
   return {
     ...requiredProps,
+    bank,
+    bankAccount,
+    fileName,
     // Any extra processing here.
   } as Transaction;
 };
 
 export const extractTransactionsFromPdf = async (
-  arrayBuffer: ArrayBuffer
+  arrayBuffer: ArrayBuffer,
+  bank?: string,
+  bankAccount?: string,
+  fileName?: string
 ): Promise<Transaction[]> => {
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
@@ -65,5 +74,7 @@ export const extractTransactionsFromPdf = async (
   }
   console.log('allTransactions:', allTransactions);
 
-  return allTransactions.map(removeIntermediateProperties);
+  return allTransactions.map((transaction) => 
+    removeIntermediateProperties(transaction, bank, bankAccount, fileName)
+  );
 };
