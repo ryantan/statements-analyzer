@@ -1,5 +1,6 @@
 'use client';
 
+import { DatePicker } from '@/components';
 import { useCategories } from '@/features/category/useCategories';
 import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick';
 import { useTransactions } from '@/features/transactions/useTransactions';
@@ -13,7 +14,6 @@ import {
   Card,
   Col,
   Row,
-  Select,
   Space,
   Statistic,
   Table,
@@ -21,6 +21,7 @@ import {
   Typography,
 } from 'antd';
 import { format } from 'date-fns';
+import { endOfDay, isAfter, isBefore, startOfDay } from 'date-fns';
 import {
   Bar,
   BarChart,
@@ -41,15 +42,14 @@ import { useDrillDown } from './hooks/useDrillDown';
 import { CategoryStats, PieData, TransactionForStats } from './types';
 
 const { Title, Paragraph } = Typography;
-const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 export function StatsPage() {
   const { categories, categoryMap } = useCategories();
   const { transactions } = useTransactions();
-  const [selectedYear, setSelectedYear] = useState<number>(
-    new Date().getFullYear()
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
+    null
   );
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const {
     selectedCategory,
     isModalVisible,
@@ -90,18 +90,25 @@ export function StatsPage() {
       });
   }, [transactions]);
 
-  // Filter transactions by selected year and month
+  // Filter transactions by selected date range
   const filteredTransactions = useMemo(() => {
-    let filtered = processedTransactions.filter(
-      (t) => t.date.getFullYear() === selectedYear
-    );
+    let filtered = [...processedTransactions];
 
-    if (selectedMonth !== null) {
-      filtered = filtered.filter((t) => t.date.getMonth() === selectedMonth);
+    // Apply date range filter
+    if (dateRange && dateRange[0] && dateRange[1]) {
+      const startDate = startOfDay(dateRange[0]);
+      const endDate = endOfDay(dateRange[1]);
+      filtered = filtered.filter((transaction) => {
+        const transactionDate = transaction.date;
+        return (
+          isAfter(transactionDate, startDate) &&
+          isBefore(transactionDate, endDate)
+        );
+      });
     }
 
     return filtered;
-  }, [processedTransactions, selectedYear, selectedMonth]);
+  }, [processedTransactions, dateRange]);
 
   // Calculate category statistics
   // This is for the table.
@@ -239,7 +246,7 @@ export function StatsPage() {
         </Paragraph>
       </div>
 
-      {/* Year and Month Selector */}
+      {/* Date Range Selector */}
       <div
         style={{
           marginBottom: '24px',
@@ -248,42 +255,15 @@ export function StatsPage() {
           alignItems: 'center',
         }}
       >
-        <div>
-          <span style={{ marginRight: '8px' }}>Year:</span>
-          <Select
-            value={selectedYear}
-            onChange={setSelectedYear}
-            style={{ width: 120 }}
-          >
-            {availableYears.map((year) => (
-              <Option key={year} value={year}>
-                {year}
-              </Option>
-            ))}
-          </Select>
-        </div>
-        <div>
-          <span style={{ marginRight: '8px' }}>Month:</span>
-          <Select
-            value={selectedMonth}
-            onChange={setSelectedMonth}
-            style={{ width: 120 }}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>Date range:</span>
+          <RangePicker
+            value={dateRange}
+            onChange={setDateRange}
+            placeholder={['Start date', 'End date']}
+            style={{ width: '100%', maxWidth: 240, minWidth: 200 }}
             allowClear
-            placeholder="All months"
-          >
-            <Option value={0}>January</Option>
-            <Option value={1}>February</Option>
-            <Option value={2}>March</Option>
-            <Option value={3}>April</Option>
-            <Option value={4}>May</Option>
-            <Option value={5}>June</Option>
-            <Option value={6}>July</Option>
-            <Option value={7}>August</Option>
-            <Option value={8}>September</Option>
-            <Option value={9}>October</Option>
-            <Option value={10}>November</Option>
-            <Option value={11}>December</Option>
-          </Select>
+          />
         </div>
       </div>
 
