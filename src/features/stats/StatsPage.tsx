@@ -11,6 +11,7 @@ import {
   Button,
   Card,
   Col,
+  Modal,
   Row,
   Select,
   Space,
@@ -18,7 +19,6 @@ import {
   Table,
   Tag,
   Typography,
-  Modal,
 } from 'antd';
 import { format } from 'date-fns';
 import {
@@ -50,6 +50,10 @@ export function StatsPage() {
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+  });
 
   // Get unique years from transactions
   const availableYears = useMemo(() => {
@@ -170,13 +174,20 @@ export function StatsPage() {
   // Get transactions for selected category
   const selectedCategoryTransactions = useMemo(() => {
     if (!selectedCategory) return [];
-    return filteredTransactions.filter(t => t.parentCategoryKey === selectedCategory);
+    return filteredTransactions.filter(
+      (t) => t.parentCategoryKey === selectedCategory
+    );
   }, [filteredTransactions, selectedCategory]);
 
   // Handle pie chart click
   const handlePieClick = (data: PieData) => {
     setSelectedCategory(data.key);
     setIsModalVisible(true);
+    // Reset pagination when changing category
+    setPagination({
+      current: 1,
+      pageSize: 20,
+    });
   };
 
   // Render a custom tooltip for bar chart displaying total and number of transactions.
@@ -440,6 +451,7 @@ export function StatsPage() {
         width={1000}
       >
         <Table
+          key={selectedCategory} // Force table to reset when category changes
           dataSource={selectedCategoryTransactions}
           columns={[
             {
@@ -447,7 +459,7 @@ export function StatsPage() {
               dataIndex: 'date',
               key: 'date',
               render: (date: Date) => format(date, 'MMM dd, yyyy'),
-              sorter: (a: TransactionForStats, b: TransactionForStats) => 
+              sorter: (a: TransactionForStats, b: TransactionForStats) =>
                 a.date.getTime() - b.date.getTime(),
             },
             {
@@ -471,13 +483,17 @@ export function StatsPage() {
                   ${amount.toFixed(2)}
                 </span>
               ),
-              sorter: (a: TransactionForStats, b: TransactionForStats) => a.amount - b.amount,
+              sorter: (a: TransactionForStats, b: TransactionForStats) =>
+                a.amount - b.amount,
             },
             {
               title: 'Category',
               dataIndex: 'categoryKey',
               key: 'categoryKey',
-              render: (categoryKey: string | undefined, record: TransactionForStats) => {
+              render: (
+                categoryKey: string | undefined,
+                record: TransactionForStats
+              ) => {
                 const key = categoryKey || record.autoCategoryKey;
                 const category = categoryMap.get(key || '');
                 return category ? (
@@ -496,11 +512,17 @@ export function StatsPage() {
             },
           ]}
           pagination={{
-            pageSize: 20,
+            ...pagination,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => 
+            showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} transactions`,
+            onChange: (page, pageSize) => {
+              setPagination({
+                current: page,
+                pageSize: pageSize || 20,
+              });
+            },
           }}
           rowKey="key"
           scroll={{ x: 800 }}
