@@ -19,4 +19,5 @@ export type PieData = {
 
 export type TransactionForStats = Transaction & {
   parentCategoryKey: string;
+  resolvedDate: Date;
 };
