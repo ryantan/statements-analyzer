@@ -17,6 +17,10 @@ export type Transaction = {
   accountingMonth?: number;
   accountingDay?: number;
   accountingDate?: Date;
+  // Bank and file tracking properties
+  bank?: string;
+  bankAccount?: string;
+  fileName?: string;
 };
 
 export type TransactionRaw = Omit<Transaction, 'date' | 'accountingDate'> & {
