@@ -1,10 +1,13 @@
 'use client';
 
+import { Category } from '@/features/category/types';
+
 import { useMemo, useState } from 'react';
+
 import { Modal, Table, Tag } from 'antd';
 import { format } from 'date-fns';
+
 import { TransactionForStats } from '../types';
-import { Category } from '@/features/category/types';
 
 interface DrillDownModalProps {
   isVisible: boolean;
@@ -23,15 +26,13 @@ export function DrillDownModal({
 }: DrillDownModalProps) {
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 20,
+    pageSize: 10,
   });
 
   // Get transactions for selected category
   const selectedCategoryTransactions = useMemo(() => {
     if (!selectedCategory) return [];
-    return transactions.filter(
-      (t) => t.parentCategoryKey === selectedCategory
-    );
+    return transactions.filter((t) => t.parentCategoryKey === selectedCategory);
   }, [transactions, selectedCategory]);
 
   // Reset pagination when category changes
@@ -39,7 +40,7 @@ export function DrillDownModal({
     if (selectedCategory) {
       setPagination({
         current: 1,
-        pageSize: 20,
+        pageSize: 10,
       });
     }
   }, [selectedCategory]);
@@ -47,7 +48,7 @@ export function DrillDownModal({
   const handleClose = () => {
     setPagination({
       current: 1,
-      pageSize: 20,
+      pageSize: 10,
     });
     onClose();
   };
@@ -55,12 +56,15 @@ export function DrillDownModal({
   return (
     <Modal
       title={`Transactions for ${
-        selectedCategory ? categoryMap.get(selectedCategory)?.name || 'Unknown' : ''
+        selectedCategory
+          ? categoryMap.get(selectedCategory)?.name || 'Unknown'
+          : ''
       }`}
       open={isVisible}
       onCancel={handleClose}
       footer={null}
       width={1000}
+      // height="80vh"
     >
       <Table
         key={selectedCategory} // Force table to reset when category changes
@@ -95,6 +99,7 @@ export function DrillDownModal({
                 ${amount.toFixed(2)}
               </span>
             ),
+            defaultSortOrder: 'descend',
             sorter: (a: TransactionForStats, b: TransactionForStats) =>
               a.amount - b.amount,
           },
@@ -132,13 +137,13 @@ export function DrillDownModal({
           onChange: (page, pageSize) => {
             setPagination({
               current: page,
-              pageSize: pageSize || 20,
+              pageSize: pageSize || 10,
             });
           },
         }}
         rowKey="key"
-        scroll={{ x: 800 }}
+        scroll={{ x: 800, y: '60vh' }}
       />
     </Modal>
   );
-} 
+}
