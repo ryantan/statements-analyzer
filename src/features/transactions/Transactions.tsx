@@ -273,7 +273,8 @@ export function TransactionsPage() {
   const handleSetDecemberTo2024 = () => {
     const newTransactions = transactions.map((transaction) => {
       const transactionDate = new Date(transaction.date);
-      if (transactionDate.getMonth() === 11) { // December is month 11 (0-indexed)
+      if (transactionDate.getMonth() === 11) {
+        // December is month 11 (0-indexed)
         const newDate = new Date(transactionDate);
         newDate.setFullYear(2024);
         return {
@@ -288,14 +289,16 @@ export function TransactionsPage() {
       }
       return transaction;
     });
-    
+
     const decemberTransactions = newTransactions.filter((transaction) => {
       const transactionDate = new Date(transaction.date);
       return transactionDate.getMonth() === 11;
     });
-    
+
     setTransactions(newTransactions);
-    message.success(`Updated ${decemberTransactions.length} December transactions to year 2024.`);
+    message.success(
+      `Updated ${decemberTransactions.length} December transactions to year 2024.`
+    );
   };
 
   const handleSearch = (value: string) => {
