@@ -4,6 +4,7 @@ import { DatePicker } from '@/components';
 import { useCategories } from '@/features/category/useCategories';
 import { CategoryCell } from '@/features/transactions/CategoryCell';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
+import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
 import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import { TransactionDisplayItem } from '@/features/transactions/types';
 import { useTransactions } from '@/features/transactions/useTransactions';
@@ -63,6 +64,8 @@ export function TransactionsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [claimableFilter, setClaimableFilter] =
     useState<string>('not-claimable');
+  const [accountingPeriodFilter, setAccountingPeriodFilter] =
+    useState<string>('');
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
@@ -84,6 +87,12 @@ export function TransactionsPage() {
           transaction.dateFormatted,
           transaction.amount,
           transaction.remarks || '',
+          transaction.accountingDate
+            ? new Date(transaction.accountingDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+              })
+            : '',
         ]
           .join('|')
           .toUpperCase(),
@@ -137,6 +146,17 @@ export function TransactionsPage() {
       }
     }
 
+    // Apply accounting period filter
+    if (accountingPeriodFilter && accountingPeriodFilter !== '') {
+      if (accountingPeriodFilter === 'assigned') {
+        filtered = filtered.filter((transaction) => transaction.accountingDate);
+      } else if (accountingPeriodFilter === 'unassigned') {
+        filtered = filtered.filter(
+          (transaction) => !transaction.accountingDate
+        );
+      }
+    }
+
     return filtered;
   }, [
     processedTransactions,
@@ -144,6 +164,7 @@ export function TransactionsPage() {
     dateRange,
     selectedCategory,
     claimableFilter,
+    accountingPeriodFilter,
   ]);
 
   const handleClearCategories = () => {
@@ -197,6 +218,30 @@ export function TransactionsPage() {
     setTransactions(updatedTransactions);
   };
 
+  const handleAccountingDateChange = (
+    transactionKey: string,
+    accountingDate: Date | undefined
+  ) => {
+    const updatedTransactions = transactions.map((transaction) =>
+      transaction.key === transactionKey
+        ? {
+            ...transaction,
+            accountingDate,
+            accountingYear: accountingDate
+              ? accountingDate.getFullYear()
+              : undefined,
+            accountingMonth: accountingDate
+              ? accountingDate.getMonth() + 1
+              : undefined,
+            accountingDay: accountingDate
+              ? accountingDate.getDate()
+              : undefined,
+          }
+        : transaction
+    );
+    setTransactions(updatedTransactions);
+  };
+
   const handleDownloadJSON = () => {
     if (transactions.length === 0) {
       message.error('No transactions to download!');
@@ -235,6 +280,22 @@ export function TransactionsPage() {
       sortDirections: ['descend', 'ascend'],
       sorter: (a: TransactionDisplayItem, b: TransactionDisplayItem) =>
         a.date.getTime() - b.date.getTime(),
+    },
+    {
+      title: 'Accounting Period',
+      dataIndex: 'accountingDate',
+      key: 'accountingDate',
+      width: 140,
+      align: 'center' as const,
+      render: (
+        accountingDate: Date | undefined,
+        record: TransactionDisplayItem
+      ) => (
+        <AccountingDateCell
+          transaction={record}
+          onAccountingDateChange={handleAccountingDateChange}
+        />
+      ),
     },
     {
       title: 'Description',
@@ -391,7 +452,7 @@ export function TransactionsPage() {
 
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={4}>
           <Card>
             <Statistic
               title="Total Transactions"
@@ -400,7 +461,7 @@ export function TransactionsPage() {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={4}>
           <Card>
             <Statistic
               title="Net expense"
@@ -411,7 +472,7 @@ export function TransactionsPage() {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={4}>
           <Card>
             <Statistic
               title="To be categorized"
@@ -425,7 +486,7 @@ export function TransactionsPage() {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={4}>
           <Card>
             <Statistic
               title="Claimable transactions"
@@ -435,6 +496,19 @@ export function TransactionsPage() {
               precision={0}
               prefix={<CheckCircleOutlined />}
               valueStyle={{ color: '#52c41a' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={4}>
+          <Card>
+            <Statistic
+              title="Without accounting period"
+              value={
+                processedTransactions.filter((t) => !t.accountingDate).length
+              }
+              precision={0}
+              prefix={<CalendarOutlined />}
+              valueStyle={{ color: '#1890ff' }}
             />
           </Card>
         </Col>
@@ -529,6 +603,24 @@ export function TransactionsPage() {
                   { value: '', label: 'All transactions' },
                   { value: 'claimable', label: 'Claimable' },
                   { value: 'not-claimable', label: 'Not claimable' },
+                ]}
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CalendarOutlined />
+              <span style={{ whiteSpace: 'nowrap' }}>
+                Custom accounting date
+              </span>
+              <Select
+                placeholder="Filter by custom accounting period"
+                value={accountingPeriodFilter}
+                onChange={setAccountingPeriodFilter}
+                style={{ width: '100%', maxWidth: 180, minWidth: 140 }}
+                allowClear
+                options={[
+                  { value: '', label: 'All' },
+                  { value: 'assigned', label: 'Has assigned period' },
+                  { value: 'unassigned', label: 'No assigned period' },
                 ]}
               />
             </div>
