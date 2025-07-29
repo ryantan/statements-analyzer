@@ -332,7 +332,7 @@ export function MonthlyExpensesPage() {
               <Area
                 connectNulls
                 key={categoryKey}
-                type="monotone"
+                type="bump"
                 dataKey={categoryKey}
                 stackId="a"
                 fill={categoryMap.get(categoryKey)?.color || `black`}
@@ -361,7 +361,7 @@ export function MonthlyExpensesPage() {
               <Area
                 connectNulls
                 key={categoryKey}
-                type="monotone"
+                type="bump"
                 dataKey={categoryKey}
                 stackId="a"
                 fill={categoryMap.get(categoryKey)?.color || `black`}
