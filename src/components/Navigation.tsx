@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu } from 'antd';
-import { UploadOutlined, AppstoreOutlined, HomeOutlined, HistoryOutlined, BarChartOutlined } from '@ant-design/icons';
+import { UploadOutlined, AppstoreOutlined, HomeOutlined, HistoryOutlined, BarChartOutlined, CalendarOutlined } from '@ant-design/icons';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -22,6 +22,8 @@ export function Navigation() {
       setSelectedKey('transactions');
     } else if (pathname === '/stats') {
       setSelectedKey('stats');
+    } else if (pathname === '/monthly') {
+      setSelectedKey('monthly');
     }
   }, [pathname]);
 
@@ -55,6 +57,12 @@ export function Navigation() {
       icon: <BarChartOutlined />,
       label: 'Statistics',
       onClick: () => router.push('/stats'),
+    },
+    {
+      key: 'monthly',
+      icon: <CalendarOutlined />,
+      label: 'Monthly',
+      onClick: () => router.push('/monthly'),
     },
   ];
 
