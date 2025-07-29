@@ -1,6 +1,7 @@
 'use client';
 
 import { useCategories } from '@/features/category/useCategories';
+import { useAvailableHeight } from '@/utils/hooks/useAvailableHeight';
 
 import { useState } from 'react';
 
@@ -31,6 +32,9 @@ export function CategoriesPage() {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
+  });
+  const { containerRef, availableHeight } = useAvailableHeight({
+    additionalOffset: 124,
   });
 
   const columns = [
@@ -170,25 +174,28 @@ export function CategoriesPage() {
           </Button>
         </div>
 
-        <Table
-          columns={columns}
-          dataSource={categories}
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} categories`,
-            pageSizeOptions: ['10', '20', '50'],
-            onChange: (page, pageSize) => {
-              setPagination({
-                current: page,
-                pageSize: pageSize || 20,
-              });
-            },
-          }}
-          rowKey="key"
-        />
+        <div ref={containerRef}>
+          <Table
+            columns={columns}
+            dataSource={categories}
+            pagination={{
+              ...pagination,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} categories`,
+              pageSizeOptions: ['10', '20', '50'],
+              onChange: (page, pageSize) => {
+                setPagination({
+                  current: page,
+                  pageSize: pageSize || 20,
+                });
+              },
+            }}
+            scroll={{ x: 'max-content', y: availableHeight }}
+            rowKey="key"
+          />
+        </div>
       </Card>
 
       <Modal
