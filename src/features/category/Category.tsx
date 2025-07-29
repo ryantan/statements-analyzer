@@ -28,6 +28,10 @@ export function CategoriesPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form] = Form.useForm();
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+  });
 
   const columns = [
     {
@@ -169,7 +173,20 @@ export function CategoriesPage() {
         <Table
           columns={columns}
           dataSource={categories}
-          pagination={false}
+          pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} categories`,
+            pageSizeOptions: ['10', '20', '50'],
+            onChange: (page, pageSize) => {
+              setPagination({
+                current: page,
+                pageSize: pageSize || 20,
+              });
+            },
+          }}
           rowKey="key"
         />
       </Card>

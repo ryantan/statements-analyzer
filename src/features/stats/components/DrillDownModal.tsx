@@ -128,19 +128,20 @@ export function DrillDownModal({
             ellipsis: true,
           },
         ]}
-        pagination={{
-          ...pagination,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} transactions`,
-          onChange: (page, pageSize) => {
-            setPagination({
-              current: page,
-              pageSize: pageSize || 10,
-            });
-          },
-        }}
+                  pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} transactions`,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            onChange: (page, pageSize) => {
+              setPagination({
+                current: page,
+                pageSize: pageSize || 10,
+              });
+            },
+          }}
         rowKey="key"
         scroll={{ x: 800, y: '60vh' }}
       />

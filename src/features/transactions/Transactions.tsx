@@ -62,6 +62,10 @@ export function TransactionsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [claimableFilter, setClaimableFilter] =
     useState<string>('not-claimable');
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+  });
 
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
@@ -533,11 +537,18 @@ export function TransactionsPage() {
           columns={columns}
           dataSource={filteredTransactions}
           pagination={{
-            pageSize: 20,
+            ...pagination,
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} transactions`,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            onChange: (page, pageSize) => {
+              setPagination({
+                current: page,
+                pageSize: pageSize || 20,
+              });
+            },
           }}
           scroll={{ x: 1000 }}
           loading={loading}

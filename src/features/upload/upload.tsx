@@ -31,6 +31,10 @@ export function UploadPage() {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
 
   const uploadProps: UploadProps = {
     beforeUpload: (file) => {
@@ -188,7 +192,20 @@ export function UploadPage() {
             <Table
               columns={columns}
               dataSource={transactions}
-              pagination={{ pageSize: 10 }}
+              pagination={{
+                ...pagination,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} transactions`,
+                pageSizeOptions: ['10', '20', '50', '100'],
+                onChange: (page, pageSize) => {
+                  setPagination({
+                    current: page,
+                    pageSize: pageSize || 10,
+                  });
+                },
+              }}
               scroll={{ x: 800 }}
             />
           </Card>

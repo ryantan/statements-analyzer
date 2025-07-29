@@ -50,6 +50,10 @@ export function StatsPage() {
   );
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const { selectedCategory, isModalVisible, handlePieClick, closeModal } = useDrillDown();
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+  });
 
   // Get unique years from transactions
   const availableYears = useMemo(() => {
@@ -413,7 +417,20 @@ export function StatsPage() {
               ),
             },
           ]}
-          pagination={false}
+          pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} categories`,
+            pageSizeOptions: ['10', '20', '50'],
+            onChange: (page, pageSize) => {
+              setPagination({
+                current: page,
+                pageSize: pageSize || 20,
+              });
+            },
+          }}
           rowKey="categoryKey"
         />
       </Card>
