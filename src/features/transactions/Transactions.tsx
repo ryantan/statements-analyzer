@@ -421,7 +421,7 @@ export function TransactionsPage() {
     },
   ];
 
-  const totalAmount = transactions.reduce(
+  const totalAmount = processedTransactions.reduce(
     (sum, transaction) => sum + transaction.amount,
     0
   );
@@ -516,10 +516,10 @@ export function TransactionsPage() {
           <Card>
             <Statistic
               title="Net expense"
-              value={-1 * totalAmount}
+              value={totalAmount}
               precision={2}
               prefix="$"
-              valueStyle={{ color: totalAmount >= 0 ? '#3f8600' : '#cf1322' }}
+              valueStyle={{ color: '#cf1322' }}
             />
           </Card>
         </Col>
