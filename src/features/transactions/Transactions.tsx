@@ -12,6 +12,7 @@ import {
   isClaimable,
   isNotClaimable,
 } from '@/features/transactions/utils/isNotClaimable';
+import { useAvailableHeight } from '@/utils/hooks/useAvailableHeight';
 
 import { useMemo, useState } from 'react';
 
@@ -65,6 +66,9 @@ export function TransactionsPage() {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
+  });
+  const { containerRef, availableHeight } = useAvailableHeight({
+    additionalOffset: 124,
   });
 
   // Filter transactions when search text or uncategorized filter changes
@@ -531,42 +535,44 @@ export function TransactionsPage() {
           </div>
         </div>
 
-        <Table<TransactionDisplayItem>
-          columns={columns}
-          dataSource={filteredTransactions}
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} transactions`,
-            pageSizeOptions: ['10', '20', '50', '100'],
-            onChange: (page, pageSize) => {
-              setPagination({
-                current: page,
-                pageSize: pageSize || 20,
-              });
-            },
-          }}
-          scroll={{ x: 'max-content' }}
-          loading={loading}
-          locale={{
-            emptyText: (
-              <Empty
-                description={
-                  <span>
-                    No transactions found.{' '}
-                    <Button type="link" onClick={loadFromLocalStorage}>
-                      Refresh
-                    </Button>{' '}
-                    or upload some transactions first.
-                  </span>
-                }
-              />
-            ),
-          }}
-          rowKey="key"
-        />
+        <div ref={containerRef}>
+          <Table<TransactionDisplayItem>
+            columns={columns}
+            dataSource={filteredTransactions}
+            pagination={{
+              ...pagination,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} transactions`,
+              pageSizeOptions: ['10', '20', '50', '100'],
+              onChange: (page, pageSize) => {
+                setPagination({
+                  current: page,
+                  pageSize: pageSize || 20,
+                });
+              },
+            }}
+            scroll={{ x: 'max-content', y: availableHeight }}
+            loading={loading}
+            locale={{
+              emptyText: (
+                <Empty
+                  description={
+                    <span>
+                      No transactions found.{' '}
+                      <Button type="link" onClick={loadFromLocalStorage}>
+                        Refresh
+                      </Button>{' '}
+                      or upload some transactions first.
+                    </span>
+                  }
+                />
+              ),
+            }}
+            rowKey="key"
+          />
+        </div>
       </Card>
     </div>
   );
