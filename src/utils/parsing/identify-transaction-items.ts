@@ -88,14 +88,12 @@ export const identifyTransactionItems = (
     if (monthItem && amountItem) {
       const amountFormatted = amountItem.str;
       let amount = 0;
+      const withoutCommaBrackets = amountFormatted.replaceAll(/([(),])/g, '');
       if (amountFormatted.startsWith('(')) {
-        // const withoutBrackets = amountFormatted.substring(1, amountFormatted.length - 1);
-        const withoutBrackets = amountFormatted.replaceAll(/([(),])/g, '');
-        // console.log('withoutBrackets', withoutBrackets);
-        amount = parseFloat(withoutBrackets);
+        amount = parseFloat(withoutCommaBrackets);
         amount *= -1;
       } else {
-        amount = parseFloat(amountFormatted);
+        amount = parseFloat(withoutCommaBrackets);
       }
 
       const date = parseDayMonth(dayItem.str, monthItem.str);
