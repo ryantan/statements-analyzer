@@ -11,7 +11,6 @@ import {
   Button,
   Card,
   Col,
-  Modal,
   Row,
   Select,
   Space,
@@ -37,6 +36,8 @@ import {
 } from 'recharts';
 
 import { CategoryStats, PieData, TransactionForStats } from './types';
+import { DrillDownModal } from './components/DrillDownModal';
+import { useDrillDown } from './hooks/useDrillDown';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
@@ -48,12 +49,7 @@ export function StatsPage() {
     new Date().getFullYear()
   );
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 20,
-  });
+  const { selectedCategory, isModalVisible, handlePieClick, closeModal } = useDrillDown();
 
   // Get unique years from transactions
   const availableYears = useMemo(() => {
@@ -171,24 +167,7 @@ export function StatsPage() {
     .reduce((sum, t) => sum + t.amount, 0)
     .toFixed(2);
 
-  // Get transactions for selected category
-  const selectedCategoryTransactions = useMemo(() => {
-    if (!selectedCategory) return [];
-    return filteredTransactions.filter(
-      (t) => t.parentCategoryKey === selectedCategory
-    );
-  }, [filteredTransactions, selectedCategory]);
 
-  // Handle pie chart click
-  const handlePieClick = (data: PieData) => {
-    setSelectedCategory(data.key);
-    setIsModalVisible(true);
-    // Reset pagination when changing category
-    setPagination({
-      current: 1,
-      pageSize: 20,
-    });
-  };
 
   // Render a custom tooltip for bar chart displaying total and number of transactions.
   const renderBarTooltip: TooltipProps<any, any>['content'] = (props) => {
@@ -440,94 +419,13 @@ export function StatsPage() {
       </Card>
 
       {/* Drill-down Modal */}
-      <Modal
-        title={`Transactions for ${selectedCategory ? categoryMap.get(selectedCategory)?.name || 'Unknown' : ''}`}
-        open={isModalVisible}
-        onCancel={() => {
-          setIsModalVisible(false);
-          setSelectedCategory(null);
-        }}
-        footer={null}
-        width={1000}
-      >
-        <Table
-          key={selectedCategory} // Force table to reset when category changes
-          dataSource={selectedCategoryTransactions}
-          columns={[
-            {
-              title: 'Date',
-              dataIndex: 'date',
-              key: 'date',
-              render: (date: Date) => format(date, 'MMM dd, yyyy'),
-              sorter: (a: TransactionForStats, b: TransactionForStats) =>
-                a.date.getTime() - b.date.getTime(),
-            },
-            {
-              title: 'Description',
-              dataIndex: 'description',
-              key: 'description',
-              render: (description: string[]) => description.join(' '),
-              ellipsis: true,
-            },
-            {
-              title: 'Amount',
-              dataIndex: 'amount',
-              key: 'amount',
-              render: (amount: number) => (
-                <span
-                  style={{
-                    color: amount >= 0 ? 'green' : 'red',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  ${amount.toFixed(2)}
-                </span>
-              ),
-              sorter: (a: TransactionForStats, b: TransactionForStats) =>
-                a.amount - b.amount,
-            },
-            {
-              title: 'Category',
-              dataIndex: 'categoryKey',
-              key: 'categoryKey',
-              render: (
-                categoryKey: string | undefined,
-                record: TransactionForStats
-              ) => {
-                const key = categoryKey || record.autoCategoryKey;
-                const category = categoryMap.get(key || '');
-                return category ? (
-                  <Tag color={category.color}>{category.name}</Tag>
-                ) : (
-                  <Tag>Unknown</Tag>
-                );
-              },
-            },
-            {
-              title: 'Remarks',
-              dataIndex: 'remarks',
-              key: 'remarks',
-              render: (remarks: string | undefined) => remarks || '-',
-              ellipsis: true,
-            },
-          ]}
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} transactions`,
-            onChange: (page, pageSize) => {
-              setPagination({
-                current: page,
-                pageSize: pageSize || 20,
-              });
-            },
-          }}
-          rowKey="key"
-          scroll={{ x: 800 }}
-        />
-      </Modal>
+      <DrillDownModal
+        isVisible={isModalVisible}
+        onClose={closeModal}
+        selectedCategory={selectedCategory}
+        categoryMap={categoryMap}
+        transactions={filteredTransactions}
+      />
     </div>
   );
 }
