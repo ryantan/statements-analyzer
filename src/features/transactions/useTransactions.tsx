@@ -20,21 +20,72 @@ export const useTransactions = () => {
     }
   };
 
+  // Accepts a string containing JSON data and returns an array of transactions.
+  const parseFromString = (
+    content: string
+  ):
+    | { error: string; data?: Transaction[] }
+    | { error?: string; data: Transaction[] } => {
+    const rawTransactions = JSON.parse(content) as TransactionRaw[];
+
+    // Validate that the imported data is an array
+    if (!Array.isArray(rawTransactions)) {
+      return {
+        error: 'Invalid file format. Expected an array of transactions.',
+      };
+    }
+
+    // Basic validation of transaction structure
+    const isValidTransaction = (transaction: TransactionRaw) => {
+      return (
+        transaction &&
+        typeof transaction === 'object' &&
+        transaction.key &&
+        transaction.date &&
+        typeof transaction.amount === 'number'
+      );
+    };
+
+    const validTransactions = rawTransactions.filter(isValidTransaction);
+    if (validTransactions.length === 0) {
+      return { error: 'No valid transactions found in the file.' };
+    }
+
+    if (validTransactions.length !== rawTransactions.length) {
+      message.warning(
+        `${rawTransactions.length - validTransactions.length} invalid transactions were skipped.`
+      );
+    }
+
+    const parsedTransactions = rawTransactions.map((item) => {
+      const date = parseJSON(item.date);
+      const accountingDate = item.accountingDate
+        ? parseJSON(item.accountingDate)
+        : undefined;
+      return { ...item, date, accountingDate } as Transaction;
+    });
+
+    return { data: parsedTransactions };
+  };
+
   const loadFromLocalStorage = () => {
     setLoading(true);
     try {
       const storedTransactions = localStorage.getItem('transactions');
       if (storedTransactions) {
-        const rawTransactions = JSON.parse(
-          storedTransactions
-        ) as TransactionRaw[];
-        const parsedTransactions = rawTransactions.map((item) => {
-          const date = parseJSON(item.date);
-          const accountingDate = item.accountingDate
-            ? parseJSON(item.accountingDate)
-            : undefined;
-          return { ...item, date, accountingDate } as Transaction;
-        });
+        const { error, data: parsedTransactions } =
+          parseFromString(storedTransactions);
+        if (error) {
+          message.error(error).then();
+          _setTransactions([]);
+          return;
+        }
+        if (!parsedTransactions) {
+          message.error('Got undefined response from parseFromString').then();
+          _setTransactions([]);
+          return;
+        }
+
         _setTransactions(parsedTransactions);
         message.success(
           `Loaded ${parsedTransactions.length} transactions from storage`
@@ -47,6 +98,36 @@ export const useTransactions = () => {
       console.error('Error loading transactions:', error);
       message.error('Failed to load transactions from localStorage');
       _setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFromFile = (fileContent: string) => {
+    setLoading(true);
+    try {
+      if (!fileContent) {
+        message.error('Got empty file content').then();
+        return;
+      }
+
+      const { error, data: parsedTransactions } = parseFromString(fileContent);
+      if (error) {
+        message.error(error).then();
+        return;
+      }
+      if (!parsedTransactions) {
+        message.error('Got undefined response from parseFromString').then();
+        return;
+      }
+
+      setTransactions(parsedTransactions);
+      message
+        .success(`Loaded ${parsedTransactions.length} transactions from file`)
+        .then();
+    } catch (error) {
+      console.error('Error loading transactions:', error);
+      message.error('Failed to load transactions from file');
     } finally {
       setLoading(false);
     }
@@ -72,6 +153,8 @@ export const useTransactions = () => {
   return {
     transactions,
     setTransactions,
+    parseFromString,
+    loadFromFile,
     loadFromLocalStorage,
     loading,
     updateItem,
