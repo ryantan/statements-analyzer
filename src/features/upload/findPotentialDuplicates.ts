@@ -5,7 +5,7 @@ import uniqBy from 'lodash/unionBy';
 
 export const findPotentialDuplicates = (transactions: Transaction[]) => {
   const uniqueFunction = (item: Transaction) =>
-    `${item.dateFormatted}|${item.amountFormatted}|${item.description.join(' ')}`;
+    `${item.dateFormatted}|${item.amountFormatted}|${item.description.join(' ')}|${item.bank || ''}|${item.bankAccount || ''}|${item.fileName || ''}`;
 
   const duplicateCheck = uniqBy(transactions, uniqueFunction);
   console.log('Items in allTransactions:', transactions.length);
