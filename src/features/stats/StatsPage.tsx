@@ -35,9 +35,9 @@ import {
   YAxis,
 } from 'recharts';
 
-import { CategoryStats, PieData, TransactionForStats } from './types';
 import { DrillDownModal } from './components/DrillDownModal';
 import { useDrillDown } from './hooks/useDrillDown';
+import { CategoryStats, PieData, TransactionForStats } from './types';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
@@ -49,7 +49,13 @@ export function StatsPage() {
     new Date().getFullYear()
   );
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-  const { selectedCategory, isModalVisible, handlePieClick, closeModal } = useDrillDown();
+  const {
+    selectedCategory,
+    isModalVisible,
+    handleBarClick,
+    handlePieClick,
+    closeModal,
+  } = useDrillDown();
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
@@ -170,8 +176,6 @@ export function StatsPage() {
   const totalExpense = filteredTransactions
     .reduce((sum, t) => sum + t.amount, 0)
     .toFixed(2);
-
-
 
   // Render a custom tooltip for bar chart displaying total and number of transactions.
   const renderBarTooltip: TooltipProps<any, any>['content'] = (props) => {
@@ -310,7 +314,7 @@ export function StatsPage() {
       {/* Charts */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24}>
-          <Card title="Category Distribution (Bar Chart)">
+          <Card title="Category Distribution (Bar Chart) - Click to drill down">
             <ResponsiveContainer width="100%" height={pieData.length * 32}>
               <BarChart data={pieData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" />
@@ -321,6 +325,7 @@ export function StatsPage() {
                   dataKey="value"
                   fill="#8884d8"
                   label={renderCustomBarLabel}
+                  onClick={handleBarClick}
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
