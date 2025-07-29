@@ -2,12 +2,12 @@
 
 import { DatePicker } from '@/components';
 import { useCategories } from '@/features/category/useCategories';
+import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
 import { CategoryCell } from '@/features/transactions/components/CategoryCell';
 import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import { TransactionDisplayItem } from '@/features/transactions/types';
-import { useTransactions } from '@/features/transactions/useTransactions';
 import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
 import {
   isClaimable,
@@ -55,8 +55,12 @@ const { RangePicker } = DatePicker;
 
 export function TransactionsPage() {
   const { categories } = useCategories();
-  const { transactions, setTransactions, loadFromLocalStorage, loading } =
-    useTransactions();
+  const {
+    transactions,
+    setTransactions,
+    loadTransactions,
+    isLoadingTransactions,
+  } = useTransactions();
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
@@ -404,8 +408,8 @@ export function TransactionsPage() {
         <Space>
           <Button
             icon={<ReloadOutlined />}
-            onClick={loadFromLocalStorage}
-            loading={loading}
+            onClick={loadTransactions}
+            loading={isLoadingTransactions}
           >
             Refresh
           </Button>
@@ -647,14 +651,14 @@ export function TransactionsPage() {
               },
             }}
             scroll={{ x: 'max-content', y: availableHeight }}
-            loading={loading}
+            loading={isLoadingTransactions}
             locale={{
               emptyText: (
                 <Empty
                   description={
                     <span>
                       No transactions found.{' '}
-                      <Button type="link" onClick={loadFromLocalStorage}>
+                      <Button type="link" onClick={loadTransactions}>
                         Refresh
                       </Button>{' '}
                       or upload some transactions first.

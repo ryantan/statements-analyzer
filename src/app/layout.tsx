@@ -1,4 +1,5 @@
 import { Navigation } from '@/components/Navigation';
+import { TransactionsProvider } from '@/features/transactions/TransactionsContext';
 
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -35,8 +36,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AntdRegistry>
-          <Navigation />
-          <main style={{ padding: '24px' }}>{children}</main>
+          <TransactionsProvider>
+            <Navigation />
+            <main style={{ padding: '24px' }}>{children}</main>
+          </TransactionsProvider>
         </AntdRegistry>
       </body>
     </html>
