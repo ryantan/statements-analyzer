@@ -52,6 +52,19 @@ export const useTransactions = () => {
     }
   };
 
+  const updateItem = (
+    key: string,
+    updater: (item: Transaction) => Transaction
+  ) => {
+    const newTransactions = transactions.map((item) => {
+      if (item.key === key) {
+        return updater(item);
+      }
+      return item;
+    });
+    setTransactions(newTransactions);
+  };
+
   useEffect(() => {
     loadFromLocalStorage();
   }, []);
@@ -61,5 +74,6 @@ export const useTransactions = () => {
     setTransactions,
     loadFromLocalStorage,
     loading,
+    updateItem,
   };
 };
