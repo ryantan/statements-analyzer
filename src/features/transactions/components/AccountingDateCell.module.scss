@@ -1,0 +1,22 @@
+.accountingDateCell {
+  width: 128px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+
+  .accountingDateCellDelete {
+    visibility: hidden;
+    padding: 2px;
+    //flex: 0 0 24px;
+
+    position: absolute;
+    right: -12px;
+  }
+
+  &:hover {
+    .accountingDateCellDelete {
+      visibility: visible;
+    }
+  }
+}
