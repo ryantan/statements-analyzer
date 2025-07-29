@@ -14,6 +14,8 @@ import type { UploadFile, UploadProps } from 'antd';
 import {
   Button,
   Card,
+  Form,
+  Input,
   Popconfirm,
   Table,
   Typography,
@@ -35,6 +37,7 @@ export function UploadPage() {
     current: 1,
     pageSize: 10,
   });
+  const [form] = Form.useForm();
 
   const uploadProps: UploadProps = {
     beforeUpload: (file) => {
@@ -58,6 +61,9 @@ export function UploadPage() {
     setLoading(true);
 
     const transactions: Transaction[] = [];
+    const formValues = form.getFieldsValue();
+    const bank = formValues.bank || 'Unknown Bank';
+    const bankAccount = formValues.bankAccount || 'Unknown Account';
 
     for (const fileListItem of fileList) {
       const file = fileListItem.originFileObj;
@@ -69,8 +75,12 @@ export function UploadPage() {
 
       try {
         const arrayBuffer = await file.arrayBuffer();
-        const transactionsOnThisPage =
-          await extractTransactionsFromPdf(arrayBuffer);
+        const transactionsOnThisPage = await extractTransactionsFromPdf(
+          arrayBuffer,
+          bank,
+          bankAccount,
+          file.name
+        );
         transactions.push(...transactionsOnThisPage);
       } catch (error) {
         console.error('Error parsing PDF:', error);
@@ -125,6 +135,29 @@ export function UploadPage() {
       ),
     },
     {
+      title: 'Bank',
+      dataIndex: 'bank',
+      key: 'bank',
+      width: 120,
+    },
+    {
+      title: 'Account',
+      dataIndex: 'bankAccount',
+      key: 'bankAccount',
+      width: 120,
+    },
+    // {
+    //   title: 'File',
+    //   dataIndex: 'fileName',
+    //   key: 'fileName',
+    //   width: 150,
+    //   render: (fileName: string) => (
+    //     <span style={{ fontSize: '12px', color: '#666' }}>
+    //       {fileName}
+    //     </span>
+    //   ),
+    // },
+    {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
@@ -144,46 +177,54 @@ export function UploadPage() {
         <Title level={2}>Bank Statement Upload</Title>
 
         <Card style={{ marginBottom: '24px' }}>
-          <Upload {...uploadProps}>
-            <Button icon={<UploadOutlined />}>Select PDF File</Button>
-          </Upload>
+          <Form form={form} layout="vertical">
+            <Form.Item label="Bank Name" name="bank">
+              <Input placeholder="Enter bank name" />
+            </Form.Item>
+            <Form.Item label="Bank Account" name="bankAccount">
+              <Input placeholder="Enter bank account number" />
+            </Form.Item>
+            <Upload {...uploadProps}>
+              <Button icon={<UploadOutlined />}>Select PDF File</Button>
+            </Upload>
 
-          <Button
-            type="primary"
-            onClick={handleParsePDF}
-            loading={loading}
-            style={{ marginTop: '16px' }}
-            disabled={fileList.length === 0}
-          >
-            Parse Transactions
-          </Button>
-          {hasParsedTransactions && (
             <Button
-              icon={<DownloadOutlined />}
-              onClick={handleDownloadJSON}
-              style={{ marginTop: '16px', marginLeft: '8px' }}
-              disabled={transactions.length === 0}
+              type="primary"
+              onClick={handleParsePDF}
+              loading={loading}
+              style={{ marginTop: '16px' }}
+              disabled={fileList.length === 0}
             >
-              Download JSON
+              Parse Transactions
             </Button>
-          )}
-          {hasParsedTransactions && (
-            <Popconfirm
-              title="Confirm overwrite"
-              description="Are you sure to replace contents in localStorage?"
-              onConfirm={handleOverwriteLocalStorage}
-              // onCancel={cancel}
-              okText="Yes"
-              cancelText="No"
-            >
+            {hasParsedTransactions && (
               <Button
-                icon={<SaveOutlined />}
+                icon={<DownloadOutlined />}
+                onClick={handleDownloadJSON}
                 style={{ marginTop: '16px', marginLeft: '8px' }}
+                disabled={transactions.length === 0}
               >
-                Overwrite localStorage
+                Download JSON
               </Button>
-            </Popconfirm>
-          )}
+            )}
+            {hasParsedTransactions && (
+              <Popconfirm
+                title="Confirm overwrite"
+                description="Are you sure to replace contents in localStorage?"
+                onConfirm={handleOverwriteLocalStorage}
+                // onCancel={cancel}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  icon={<SaveOutlined />}
+                  style={{ marginTop: '16px', marginLeft: '8px' }}
+                >
+                  Overwrite localStorage
+                </Button>
+              </Popconfirm>
+            )}
+          </Form>
         </Card>
 
         {hasParsedTransactions && (
