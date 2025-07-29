@@ -3,6 +3,8 @@
 import { DatePicker } from '@/components';
 import { useCategories } from '@/features/category/useCategories';
 import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick';
+import { renderBarLabel } from '@/features/stats/components/renderBarLabel';
+import { renderBarTooltip } from '@/features/stats/components/renderBarTooltip';
 import { useTransactions } from '@/features/transactions/useTransactions';
 import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
 import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
@@ -20,19 +22,16 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { format } from 'date-fns';
-import { endOfDay, isAfter, isBefore, startOfDay } from 'date-fns';
+import { endOfDay, format, isAfter, isBefore, startOfDay } from 'date-fns';
 import {
   Bar,
   BarChart,
-  BarProps,
   CartesianGrid,
   Cell,
   Pie,
   PieChart,
   ResponsiveContainer,
   Tooltip,
-  TooltipProps,
   XAxis,
   YAxis,
 } from 'recharts';
@@ -61,12 +60,6 @@ export function StatsPage() {
     current: 1,
     pageSize: 20,
   });
-
-  // Get unique years from transactions
-  const availableYears = useMemo(() => {
-    const years = new Set(transactions.map((t) => t.date.getFullYear()));
-    return Array.from(years).sort((a, b) => b - a);
-  }, [transactions]);
 
   // Group by parent categories
   const processedTransactions = useMemo(() => {
@@ -185,58 +178,6 @@ export function StatsPage() {
     .reduce((sum, t) => sum + t.amount, 0)
     .toFixed(2);
 
-  // Render a custom tooltip for bar chart displaying total and number of transactions.
-  const renderBarTooltip: TooltipProps<any, any>['content'] = (props) => {
-    const { active, payload, label } = props;
-    const items = payload as { payload: PieData }[];
-    const isVisible = active && items && items.length;
-    if (!isVisible) {
-      return (
-        <div
-          className="bar-chart-tooltip"
-          style={{
-            visibility: 'hidden',
-            background: '#fff',
-          }}
-        ></div>
-      );
-    }
-
-    const firstDataItem = items[0].payload;
-    return (
-      <div
-        className="bar-chart-tooltip"
-        style={{
-          visibility: 'visible',
-          background: '#fff',
-          padding: 16,
-        }}
-      >
-        <strong>{label}</strong>
-        <p className="label">${firstDataItem.value}</p>
-        <p className="intro">{firstDataItem.transactionsCount} Transactions</p>
-      </div>
-    );
-  };
-
-  // Render the total amount on the right of the bars.
-  const renderCustomBarLabel: BarProps['label'] = (props) => {
-    const { x, y, width, height, value } = props;
-    const offsetX = width + 10; // Adjust offset based on width
-
-    return (
-      <text
-        x={x + offsetX}
-        y={y + height / 2}
-        fill="#666"
-        textAnchor="left"
-        dominantBaseline="central"
-      >
-        ${value}
-      </text>
-    );
-  };
-
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '24px' }}>
@@ -310,7 +251,7 @@ export function StatsPage() {
                 <Bar
                   dataKey="value"
                   fill="#8884d8"
-                  label={renderCustomBarLabel}
+                  label={renderBarLabel}
                   onClick={handleBarClick}
                 >
                   {pieData.map((entry, index) => (
