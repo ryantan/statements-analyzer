@@ -1,4 +1,7 @@
 import { useState } from 'react';
+
+import { BarProps } from 'recharts';
+
 import { PieData } from '../types';
 
 export function useDrillDown() {
@@ -10,6 +13,13 @@ export function useDrillDown() {
     setIsModalVisible(true);
   };
 
+  const handleBarClick: BarProps['onClick'] = (event) => {
+    // Extract the category key from the bar chart data
+    if (event && event.payload && event.payload.key) {
+      handlePieClick(event.payload as PieData);
+    }
+  };
+
   const closeModal = () => {
     setIsModalVisible(false);
     setSelectedCategory(null);
@@ -19,6 +29,7 @@ export function useDrillDown() {
     selectedCategory,
     isModalVisible,
     handlePieClick,
+    handleBarClick,
     closeModal,
   };
-} 
+}
