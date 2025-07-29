@@ -314,6 +314,34 @@ export function MonthlyExpensesPage() {
         </ResponsiveContainer>
       </Card>
 
+      {/* Stacked Area Chart */}
+      <Card title="Monthly Expenses by Category">
+        <ResponsiveContainer width="100%" height={700}>
+          <AreaChart
+            data={monthlyData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis
+              tickFormatter={(value) => `$${Math.abs(value).toLocaleString()}`}
+            />
+            <Tooltip content={renderTooltip} />
+            <Legend />
+            {categoryKeys.map((categoryKey) => (
+              <Area
+                connectNulls
+                key={categoryKey}
+                type="monotone"
+                dataKey={categoryKey}
+                stackId="a"
+                fill={categoryMap.get(categoryKey)?.color || `black`}
+              />
+            ))}
+          </AreaChart>
+        </ResponsiveContainer>
+      </Card>
+
       {/* Data Table */}
       <Card title="Monthly Breakdown" style={{ marginTop: '24px' }}>
         <div style={{ overflowX: 'auto' }}>
