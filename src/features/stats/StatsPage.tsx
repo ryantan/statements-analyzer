@@ -68,17 +68,16 @@ export function StatsPage() {
       .filter(isNotClaimable)
       .map<TransactionForStats>((item) => {
         const categoryKey = item.categoryKey || item.autoCategoryKey;
-        if (!categoryKey) {
-          return {
-            ...item,
-            parentCategoryKey: 'unknown',
-          };
+
+        let parentCategoryKey = 'unknown';
+        if (categoryKey) {
+          parentCategoryKey = categoryKey.split('-')[0];
         }
 
-        const parentCategoryKey = categoryKey.split('-')[0];
         return {
           ...item,
           parentCategoryKey: parentCategoryKey,
+          resolvedDate: item.accountingDate || item.date,
         };
       });
   }, [transactions]);
@@ -92,7 +91,7 @@ export function StatsPage() {
       const startDate = startOfDay(dateRange[0]);
       const endDate = endOfDay(dateRange[1]);
       filtered = filtered.filter((transaction) => {
-        const transactionDate = transaction.date;
+        const transactionDate = transaction.resolvedDate;
         return (
           isAfter(transactionDate, startDate) &&
           isBefore(transactionDate, endDate)
@@ -127,7 +126,7 @@ export function StatsPage() {
       const monthlyBreakdown: Record<string, number> = {};
 
       transactions.forEach((t) => {
-        const monthKey = format(t.date, 'MMM');
+        const monthKey = format(t.resolvedDate, 'MMM');
         monthlyBreakdown[monthKey] =
           (monthlyBreakdown[monthKey] || 0) + t.amount;
       });
