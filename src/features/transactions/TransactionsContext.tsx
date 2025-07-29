@@ -9,6 +9,7 @@ interface TransactionsContextType {
   transactions: Transaction[];
   setTransactions: (transactions: Transaction[]) => void;
   loadTransactions: () => void;
+  loadFromFile: (fileContent: string) => void;
   isLoadingTransactions: boolean;
   updateTransactionItem: (
     key: string,
@@ -29,6 +30,7 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     transactions,
     setTransactions,
     loadFromLocalStorage: loadTransactions,
+    loadFromFile,
     loading: isLoadingTransactions,
     updateItem: updateTransactionItem,
   } = useTransactionsHook();
@@ -37,6 +39,7 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     transactions,
     setTransactions,
     loadTransactions,
+    loadFromFile,
     isLoadingTransactions,
     updateTransactionItem,
   };
