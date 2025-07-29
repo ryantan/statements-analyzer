@@ -5,8 +5,9 @@ import { TransactionDisplayItem } from '@/features/transactions/types';
 
 import { useState } from 'react';
 
-import { EditOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Tag } from 'antd';
+import { Dropdown, Tag } from 'antd';
+
+import styles from './CategoryCell.module.scss';
 
 interface CategoryCellProps {
   transaction: TransactionDisplayItem;
@@ -22,8 +23,6 @@ export function CategoryCell({
   categories,
   onCategoryChange,
 }: CategoryCellProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   const currentCategory = transaction.resolvedCategoryKey
     ? categories.find((c) => c.key === transaction.resolvedCategoryKey)
     : null;
@@ -56,44 +55,24 @@ export function CategoryCell({
   ];
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        minHeight: '32px',
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {currentCategory ? (
-        <Tag color={currentCategory.color}>{currentCategory.name}</Tag>
-      ) : (
-        <span style={{ color: '#999' }}>-</span>
-      )}
-
-      {isHovered && (
-        <Dropdown
-          menu={{
-            items: dropdownItems,
-            onClick: ({ key }) => handleCategorySelect(key),
-            style: { maxHeight: 300 },
-          }}
-          trigger={['click']}
-          placement="bottomLeft"
-        >
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            style={{
-              padding: '2px 4px',
-              height: '24px',
-              opacity: 0.7,
-            }}
-          />
-        </Dropdown>
-      )}
+    <div className={styles.categoryCell}>
+      <Dropdown
+        menu={{
+          items: dropdownItems,
+          onClick: ({ key }) => handleCategorySelect(key),
+          style: { maxHeight: 300 },
+        }}
+        trigger={['click']}
+        placement="bottomLeft"
+      >
+        <div>
+          {currentCategory ? (
+            <Tag color={currentCategory.color}>{currentCategory.name}</Tag>
+          ) : (
+            <span style={{ color: '#999', width: '100%' }}>-</span>
+          )}
+        </div>
+      </Dropdown>
     </div>
   );
 }
