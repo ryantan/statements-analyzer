@@ -370,6 +370,7 @@ export function TransactionsPage() {
       key: 'amount',
       width: 120,
       align: 'right' as const,
+      fixed: 'right',
       sorter: (a, b) => a.amount - b.amount,
       render: (amount: number) => (
         <span
