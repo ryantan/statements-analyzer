@@ -8,26 +8,27 @@ import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
 
 import { useMemo, useState } from 'react';
 
+import { Card, Col, Row, Select, Space, Statistic, Typography } from 'antd';
 import {
-  Card,
-  Col,
-  Row,
-  Select,
-  Space,
-  Statistic,
-  Typography,
-} from 'antd';
-import { endOfDay, format, isAfter, isBefore, startOfDay, parseISO } from 'date-fns';
+  endOfDay,
+  format,
+  isAfter,
+  isBefore,
+  parseISO,
+  startOfDay,
+} from 'date-fns';
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
-  Legend,
 } from 'recharts';
 
 const { Title, Paragraph } = Typography;
@@ -85,54 +86,83 @@ export function MonthlyExpensesPage() {
     return filtered;
   }, [processedTransactions, dateRange]);
 
+  // Get unique category names for legend (sorted by total amount across all months)
+  // TODO: Use categoryKey, to prevent duplicate names.
+  const { categoryKeysLargestFirst, categoryKeys } = useMemo(() => {
+    // Key = category key, value = total.
+    const categoryTotals = new Map<string, number>();
+
+    filteredTransactions.forEach((transaction) => {
+      const categoryKey = transaction.parentCategoryKey;
+      categoryTotals.set(
+        categoryKey,
+        (categoryTotals.get(categoryKey) || 0) + transaction.amount
+      );
+    });
+
+    const sortedCategories = Array.from(categoryTotals.entries()).sort(
+      (a, b) => Math.abs(a[1]) - Math.abs(b[1])
+    ); // Sort by absolute value (smallest to largest)
+
+    const categoryKeys = sortedCategories.map(([key]) => key);
+    const categoryNames = sortedCategories.map(
+      ([key]) => categoryMap.get(key)?.name || 'Unknown'
+    );
+    const categoryKeysLargestFirst = categoryKeys.toReversed();
+    const categoryNamesLargestFirst = categoryNames.toReversed();
+
+    return {
+      categoryKeys,
+      categoryNames,
+      categoryKeysLargestFirst,
+      categoryNamesLargestFirst,
+    };
+  }, [filteredTransactions, categoryMap]);
+
   // Generate monthly stacked bar data
   const monthlyData = useMemo(() => {
+    // Key = yyyy-MM, value = { categoryKey: amount }
     const monthlyMap = new Map<string, Record<string, number>>();
-    const categoryKeys = new Set<string>();
 
     // Group transactions by month and category
     filteredTransactions.forEach((transaction) => {
       const monthKey = format(transaction.resolvedDate, 'yyyy-MM');
       const categoryKey = transaction.parentCategoryKey;
-      
+
       if (!monthlyMap.has(monthKey)) {
         monthlyMap.set(monthKey, {});
       }
-      
+
       const monthData = monthlyMap.get(monthKey)!;
-      monthData[categoryKey] = (monthData[categoryKey] || 0) + transaction.amount;
-      categoryKeys.add(categoryKey);
+      monthData[categoryKey] =
+        (monthData[categoryKey] || 0) + transaction.amount;
     });
 
     // Convert to array format for recharts
     const sortedMonths = Array.from(monthlyMap.keys()).sort();
-    
+
     return sortedMonths.map((monthKey) => {
       const monthData = monthlyMap.get(monthKey)!;
       const data: MonthlyData = {
         month: format(parseISO(`${monthKey}-01`), 'MMM yyyy'),
       };
 
-      // Add each category's data
-      Array.from(categoryKeys).forEach((categoryKey) => {
-        const categoryName = categoryMap.get(categoryKey)?.name || 'Unknown';
-        data[categoryName] = monthData[categoryKey] || 0;
-      });
+      categoryKeys
+        .map((categoryKey) => ({
+          key: categoryKey,
+          name: categoryMap.get(categoryKey)?.name || 'Unknown',
+          // Ensure amount is never negative.
+          amount: Math.max(0, monthData[categoryKey] || 0),
+        }))
+        .forEach(({ key, amount }) => {
+          data[key] = amount;
+        });
 
       return data;
     });
   }, [filteredTransactions, categoryMap]);
 
-  // Get unique category names for legend
-  const categoryNames = useMemo(() => {
-    const names = new Set<string>();
-    filteredTransactions.forEach((transaction) => {
-      const categoryKey = transaction.parentCategoryKey;
-      const categoryName = categoryMap.get(categoryKey)?.name || 'Unknown';
-      names.add(categoryName);
-    });
-    return Array.from(names);
-  }, [filteredTransactions, categoryMap]);
+  console.log('monthlyData:', monthlyData);
 
   // Calculate total expenses
   const totalExpense = filteredTransactions
@@ -143,12 +173,15 @@ export function MonthlyExpensesPage() {
   const averageMonthlyExpense = useMemo(() => {
     if (monthlyData.length === 0) return 0;
     const total = monthlyData.reduce((sum, month) => {
-      return sum + Object.keys(month).reduce((monthSum, key) => {
-        if (key !== 'month') {
-          return monthSum + (month[key] as number);
-        }
-        return monthSum;
-      }, 0);
+      return (
+        sum +
+        Object.keys(month).reduce((monthSum, key) => {
+          if (key !== 'month') {
+            return monthSum + (month[key] as number);
+          }
+          return monthSum;
+        }, 0)
+      );
     }, 0);
     return (total / monthlyData.length).toFixed(2);
   }, [monthlyData]);
@@ -157,21 +190,26 @@ export function MonthlyExpensesPage() {
   const renderTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div style={{
-          backgroundColor: '#fff',
-          border: '1px solid #ccc',
-          padding: '10px',
-          borderRadius: '4px'
-        }}>
+        <div
+          style={{
+            backgroundColor: '#fff',
+            border: '1px solid #ccc',
+            padding: '10px',
+            borderRadius: '4px',
+          }}
+        >
           <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>{label}</p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ 
-              margin: '4px 0', 
-              color: entry.color,
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: '20px'
-            }}>
+            <p
+              key={index}
+              style={{
+                margin: '4px 0',
+                color: entry.color,
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: '20px',
+              }}
+            >
               <span>{entry.name}:</span>
               <span style={{ fontWeight: 'bold' }}>
                 ${Math.abs(entry.value).toFixed(2)}
@@ -252,28 +290,24 @@ export function MonthlyExpensesPage() {
 
       {/* Stacked Bar Chart */}
       <Card title="Monthly Expenses by Category">
-        <ResponsiveContainer width="100%" height={500}>
+        <ResponsiveContainer width="100%" height={700}>
           <BarChart
             data={monthlyData}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
-            <YAxis 
+            <YAxis
               tickFormatter={(value) => `$${Math.abs(value).toLocaleString()}`}
             />
             <Tooltip content={renderTooltip} />
             <Legend />
-            {categoryNames.map((categoryName, index) => (
+            {categoryKeys.map((categoryKey) => (
               <Bar
-                key={categoryName}
-                dataKey={categoryName}
+                key={categoryKey}
+                dataKey={categoryKey}
                 stackId="a"
-                fill={categoryMap.get(
-                  Array.from(categoryMap.keys()).find(key => 
-                    categoryMap.get(key)?.name === categoryName
-                  ) || ''
-                )?.color || `#${Math.floor(Math.random()*16777215).toString(16)}`}
+                fill={categoryMap.get(categoryKey)?.color || `black`}
               />
             ))}
           </BarChart>
@@ -286,13 +320,36 @@ export function MonthlyExpensesPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold' }}>Month</th>
-                {categoryNames.map((categoryName) => (
-                  <th key={categoryName} style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>
-                    {categoryName}
+                <th
+                  style={{
+                    padding: '12px',
+                    textAlign: 'left',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Month
+                </th>
+                {categoryKeysLargestFirst.map((categoryKey) => (
+                  <th
+                    key={categoryKey}
+                    style={{
+                      padding: '12px',
+                      textAlign: 'right',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {categoryMap.get(categoryKey)?.name || 'Unknown'}
                   </th>
                 ))}
-                <th style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>Total</th>
+                <th
+                  style={{
+                    padding: '12px',
+                    textAlign: 'right',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Total
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -305,14 +362,28 @@ export function MonthlyExpensesPage() {
                 }, 0);
 
                 return (
-                  <tr key={month.month} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                    <td style={{ padding: '12px', fontWeight: 'bold' }}>{month.month}</td>
-                    {categoryNames.map((categoryName) => (
-                      <td key={categoryName} style={{ padding: '12px', textAlign: 'right' }}>
-                        ${Math.abs(month[categoryName] as number).toFixed(2)}
+                  <tr
+                    key={month.month}
+                    style={{ borderBottom: '1px solid #f0f0f0' }}
+                  >
+                    <td style={{ padding: '12px', fontWeight: 'bold' }}>
+                      {month.month}
+                    </td>
+                    {categoryKeysLargestFirst.map((categoryKey) => (
+                      <td
+                        key={categoryKey}
+                        style={{ padding: '12px', textAlign: 'right' }}
+                      >
+                        ${Math.abs(month[categoryKey] as number).toFixed(2)}
                       </td>
                     ))}
-                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>
+                    <td
+                      style={{
+                        padding: '12px',
+                        textAlign: 'right',
+                        fontWeight: 'bold',
+                      }}
+                    >
                       ${Math.abs(monthTotal).toFixed(2)}
                     </td>
                   </tr>
@@ -324,4 +395,4 @@ export function MonthlyExpensesPage() {
       </Card>
     </div>
   );
-} 
+}
