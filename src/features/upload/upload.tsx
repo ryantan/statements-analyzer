@@ -2,6 +2,7 @@
 
 import { Transaction } from '@/features/transactions/types';
 import { extractTransactionsFromPdf } from '@/features/upload/extractTransactionsFromPdf';
+import { bankParserFactory, BankName } from '@/utils/parsing/bank-parsers';
 
 import { useState } from 'react';
 
@@ -17,6 +18,7 @@ import {
   Form,
   Input,
   Popconfirm,
+  Select,
   Table,
   Typography,
   Upload,
@@ -179,7 +181,13 @@ export function UploadPage() {
         <Card style={{ marginBottom: '24px' }}>
           <Form form={form} layout="vertical">
             <Form.Item label="Bank Name" name="bank">
-              <Input placeholder="Enter bank name" />
+              <Select
+                placeholder="Select bank"
+                options={bankParserFactory.getSupportedBanks().map(bank => ({
+                  label: bank,
+                  value: bank,
+                }))}
+              />
             </Form.Item>
             <Form.Item label="Bank Account" name="bankAccount">
               <Input placeholder="Enter bank account number" />
