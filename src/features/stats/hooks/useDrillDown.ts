@@ -8,15 +8,19 @@ export function useDrillDown() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const handlePieClick = (data: PieData) => {
-    setSelectedCategory(data.key);
+  const openModalForCategory = (categoryKey: string) => {
+    setSelectedCategory(categoryKey);
     setIsModalVisible(true);
+  };
+
+  const handlePieClick = (data: PieData) => {
+    openModalForCategory(data.key);
   };
 
   const handleBarClick: BarProps['onClick'] = (event) => {
     // Extract the category key from the bar chart data
     if (event && event.payload && event.payload.key) {
-      handlePieClick(event.payload as PieData);
+      openModalForCategory((event.payload as PieData).key);
     }
   };
 
@@ -30,6 +34,7 @@ export function useDrillDown() {
     isModalVisible,
     handlePieClick,
     handleBarClick,
+    openModalForCategory,
     closeModal,
   };
 }
