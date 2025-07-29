@@ -2,7 +2,13 @@
 
 import Link from 'next/link';
 
-import { AppstoreOutlined, UploadOutlined, HistoryOutlined, BarChartOutlined, CalendarOutlined } from '@ant-design/icons';
+import {
+  AppstoreOutlined,
+  BarChartOutlined,
+  CalendarOutlined,
+  HistoryOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 import { Button, Card, Col, Flex, Row, Typography } from 'antd';
 
 const { Title, Paragraph } = Typography;
