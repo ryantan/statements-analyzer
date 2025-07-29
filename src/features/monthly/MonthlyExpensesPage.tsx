@@ -2,13 +2,21 @@
 
 import { DatePicker } from '@/components';
 import { useCategories } from '@/features/category/useCategories';
+import { useCategoryFilter } from '@/features/monthly/hooks/useCategoryFilter';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
 import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
 
 import { useMemo, useState } from 'react';
 
-import { Card, Col, Row, Select, Space, Statistic, Typography } from 'antd';
+import {
+  // Keep vertical
+  Card,
+  Col,
+  Row,
+  Statistic,
+  Typography,
+} from 'antd';
 import {
   endOfDay,
   format,
@@ -23,7 +31,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -33,7 +40,6 @@ import {
 
 const { Title, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
-const { Option } = Select;
 
 interface MonthlyData {
   month: string;
@@ -87,8 +93,11 @@ export function MonthlyExpensesPage() {
   }, [processedTransactions, dateRange]);
 
   // Get unique category names for legend (sorted by total amount across all months)
-  // TODO: Use categoryKey, to prevent duplicate names.
-  const { categoryKeysLargestFirst, categoryKeys } = useMemo(() => {
+  const {
+    // Keep vertical.
+    originalSortedCategories,
+    originalSortedCategoryKeys,
+  } = useMemo(() => {
     // Key = category key, value = total.
     const categoryTotals = new Map<string, number>();
 
@@ -100,9 +109,29 @@ export function MonthlyExpensesPage() {
       );
     });
 
-    const sortedCategories = Array.from(categoryTotals.entries()).sort(
+    const originalSortedCategories = Array.from(categoryTotals.entries()).sort(
       (a, b) => Math.abs(a[1]) - Math.abs(b[1])
-    ); // Sort by absolute value (smallest to largest)
+    );
+    const originalSortedCategoryKeys = originalSortedCategories.map(
+      ([key]) => key
+    );
+    return { originalSortedCategories, originalSortedCategoryKeys };
+  }, [filteredTransactions, categoryMap]);
+
+  const { visibleCategories, renderCategoriesFilter } = useCategoryFilter(
+    categories,
+    categoryMap,
+    originalSortedCategoryKeys
+  );
+
+  const {
+    // Keep vertical.
+    categoryKeysLargestFirst,
+    categoryKeys,
+  } = useMemo(() => {
+    const sortedCategories = originalSortedCategories.filter(([key]) =>
+      visibleCategories.has(key)
+    );
 
     const categoryKeys = sortedCategories.map(([key]) => key);
     const categoryNames = sortedCategories.map(
@@ -117,7 +146,13 @@ export function MonthlyExpensesPage() {
       categoryKeysLargestFirst,
       categoryNamesLargestFirst,
     };
-  }, [filteredTransactions, categoryMap]);
+  }, [
+    originalSortedCategories,
+    originalSortedCategoryKeys,
+    filteredTransactions,
+    categoryMap,
+    visibleCategories,
+  ]);
 
   // Generate monthly stacked bar data
   const monthlyData = useMemo(() => {
@@ -252,6 +287,8 @@ export function MonthlyExpensesPage() {
           />
         </div>
       </div>
+
+      {renderCategoriesFilter()}
 
       {/* Summary Statistics */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
