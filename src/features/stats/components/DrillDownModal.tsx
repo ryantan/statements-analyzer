@@ -1,6 +1,8 @@
 'use client';
 
 import { Category } from '@/features/category/types';
+import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
+import { useTransactions } from '@/features/transactions/useTransactions';
 
 import { useMemo, useState } from 'react';
 
@@ -28,6 +30,7 @@ export function DrillDownModal({
     current: 1,
     pageSize: 10,
   });
+  const { updateItem } = useTransactions();
 
   // Get transactions for selected category
   const selectedCategoryTransactions = useMemo(() => {
@@ -51,6 +54,22 @@ export function DrillDownModal({
       pageSize: 10,
     });
     onClose();
+  };
+
+  // Handler for accounting date changes
+  const handleAccountingDateChange = (
+    transactionKey: string,
+    accountingDate: Date | undefined
+  ) => {
+    updateItem(transactionKey, (item) => ({
+      ...item,
+      accountingDate,
+      accountingYear: accountingDate ? accountingDate.getFullYear() : undefined,
+      accountingMonth: accountingDate
+        ? accountingDate.getMonth() + 1
+        : undefined,
+      accountingDay: accountingDate ? accountingDate.getDate() : undefined,
+    }));
   };
 
   return (
@@ -77,6 +96,22 @@ export function DrillDownModal({
             render: (date: Date) => format(date, 'MMM dd, yyyy'),
             sorter: (a: TransactionForStats, b: TransactionForStats) =>
               a.date.getTime() - b.date.getTime(),
+          },
+          {
+            title: 'Accounting Period',
+            dataIndex: 'accountingDate',
+            key: 'accountingDate',
+            width: 140,
+            align: 'center' as const,
+            render: (
+              accountingDate: Date | undefined,
+              record: TransactionForStats
+            ) => (
+              <AccountingDateCell
+                transaction={record}
+                onAccountingDateChange={handleAccountingDateChange}
+              />
+            ),
           },
           {
             title: 'Description',
@@ -128,20 +163,20 @@ export function DrillDownModal({
             ellipsis: true,
           },
         ]}
-                  pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} transactions`,
-            pageSizeOptions: ['10', '20', '50', '100'],
-            onChange: (page, pageSize) => {
-              setPagination({
-                current: page,
-                pageSize: pageSize || 10,
-              });
-            },
-          }}
+        pagination={{
+          ...pagination,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} transactions`,
+          pageSizeOptions: ['10', '20', '50', '100'],
+          onChange: (page, pageSize) => {
+            setPagination({
+              current: page,
+              pageSize: pageSize || 10,
+            });
+          },
+        }}
         rowKey="key"
         scroll={{ x: 800, y: '60vh' }}
       />
