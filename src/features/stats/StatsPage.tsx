@@ -16,13 +16,14 @@ import {
   Card,
   Col,
   Row,
+  Select,
   Space,
   Statistic,
   Table,
   Tag,
   Typography,
 } from 'antd';
-import { endOfDay, format, isAfter, isBefore, startOfDay } from 'date-fns';
+import { endOfDay, format, isAfter, isBefore, startOfDay, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 import {
   Bar,
   BarChart,
@@ -42,6 +43,7 @@ import { CategoryStats, PieData, TransactionForStats } from './types';
 
 const { Title, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 export function StatsPage() {
   const { categories, categoryMap } = useCategories();
@@ -49,6 +51,7 @@ export function StatsPage() {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
   );
+  const [selectedYearMonth, setSelectedYearMonth] = useState<string | null>(null);
   const {
     selectedCategory,
     isModalVisible,
@@ -82,6 +85,45 @@ export function StatsPage() {
         };
       });
   }, [transactions]);
+
+  // Extract available year-month options from data
+  const availableYearMonths = useMemo(() => {
+    const yearMonthSet = new Set<string>();
+    
+    processedTransactions.forEach((transaction) => {
+      const yearMonth = format(transaction.resolvedDate, 'yyyy-MM');
+      yearMonthSet.add(yearMonth);
+    });
+    
+    return Array.from(yearMonthSet)
+      .sort()
+      .reverse() // Most recent first
+      .map(yearMonth => ({
+        value: yearMonth,
+        label: format(parseISO(`${yearMonth}-01`), 'MMMM yyyy')
+      }));
+  }, [processedTransactions]);
+
+  // Handle year-month selection
+  const handleYearMonthChange = (value: string | null) => {
+    setSelectedYearMonth(value);
+    
+    if (value) {
+      const [year, month] = value.split('-');
+      const startDate = startOfMonth(new Date(parseInt(year), parseInt(month) - 1));
+      const endDate = endOfMonth(new Date(parseInt(year), parseInt(month) - 1));
+      setDateRange([startDate, endDate]);
+    } else {
+      setDateRange(null);
+    }
+  };
+
+  // Handle manual date range change
+  const handleDateRangeChange = (dates: [Date | null, Date | null] | null) => {
+    setDateRange(dates);
+    // Clear year-month selection when manually changing date range
+    setSelectedYearMonth(null);
+  };
 
   // Filter transactions by selected date range
   const filteredTransactions = useMemo(() => {
@@ -195,13 +237,34 @@ export function StatsPage() {
           display: 'flex',
           gap: '16px',
           alignItems: 'center',
+          flexWrap: 'wrap',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span>Date range:</span>
+          <span>Quick select:</span>
+          <Select
+            placeholder="Select year-month"
+            value={selectedYearMonth}
+            onChange={handleYearMonthChange}
+            style={{ width: 180 }}
+            allowClear
+            showSearch
+            filterOption={(input, option) =>
+              String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            }
+          >
+            {availableYearMonths.map((option) => (
+              <Option key={option.value} value={option.value} label={option.label}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>Custom date range:</span>
           <RangePicker
             value={dateRange}
-            onChange={setDateRange}
+            onChange={handleDateRangeChange}
             placeholder={['Start date', 'End date']}
             style={{ width: '100%', maxWidth: 240, minWidth: 200 }}
             allowClear
