@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { AppstoreOutlined, UploadOutlined, HistoryOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, UploadOutlined, HistoryOutlined, BarChartOutlined, CalendarOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Flex, Row, Typography } from 'antd';
 
 const { Title, Paragraph } = Typography;
@@ -95,6 +95,62 @@ export const Home = () => {
               <Link href="/categories">
                 <Button type="primary" size="large">
                   View Categories
+                </Button>
+              </Link>
+            </Flex>
+          </Card>
+        </Col>
+
+        <Col xs={24} sm={12} md={8}>
+          <Card hoverable>
+            <Flex
+              align="center"
+              gap={16}
+              vertical
+              style={{ textAlign: 'center' }}
+            >
+              <BarChartOutlined
+                style={{
+                  fontSize: '48px',
+                  color: '#722ed1',
+                  marginBottom: '16px',
+                }}
+              />
+              <Title level={3}>View Statistics</Title>
+              <Paragraph>
+                Analyze spending patterns and category distributions
+              </Paragraph>
+              <Link href="/stats">
+                <Button type="primary" size="large">
+                  View Statistics
+                </Button>
+              </Link>
+            </Flex>
+          </Card>
+        </Col>
+
+        <Col xs={24} sm={12} md={8}>
+          <Card hoverable>
+            <Flex
+              align="center"
+              gap={16}
+              vertical
+              style={{ textAlign: 'center' }}
+            >
+              <CalendarOutlined
+                style={{
+                  fontSize: '48px',
+                  color: '#fa8c16',
+                  marginBottom: '16px',
+                }}
+              />
+              <Title level={3}>Monthly Overview</Title>
+              <Paragraph>
+                Track expenses across months with stacked bar charts
+              </Paragraph>
+              <Link href="/monthly">
+                <Button type="primary" size="large">
+                  View Monthly
                 </Button>
               </Link>
             </Flex>
