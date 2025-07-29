@@ -346,7 +346,7 @@ export function MonthlyExpensesPage() {
             />
             <Tooltip content={renderTooltip} />
             <Legend />
-            {categoryKeys.map((categoryKey) => (
+            {categoryKeysLargestFirst.map((categoryKey) => (
               <Bar
                 key={categoryKey}
                 dataKey={categoryKey}
@@ -372,7 +372,7 @@ export function MonthlyExpensesPage() {
             />
             <Tooltip content={renderTooltip} />
             <Legend />
-            {categoryKeys.map((categoryKey) => (
+            {categoryKeysLargestFirst.map((categoryKey) => (
               <Area
                 connectNulls
                 key={categoryKey}
@@ -401,7 +401,7 @@ export function MonthlyExpensesPage() {
             />
             <Tooltip content={renderTooltip} />
             <Legend />
-            {categoryKeys.map((categoryKey) => (
+            {categoryKeysLargestFirst.map((categoryKey) => (
               <Area
                 connectNulls
                 key={categoryKey}
