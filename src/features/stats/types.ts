@@ -7,6 +7,7 @@ export type CategoryStats = {
   transactionCount: number;
   averageAmount: number;
   monthlyBreakdown: Record<string, number>;
+  color: string;
 };
 
 export type PieData = {
