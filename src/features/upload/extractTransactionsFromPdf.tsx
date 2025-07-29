@@ -1,10 +1,8 @@
 import { Transaction } from '@/features/transactions/types';
 import { groupByDelimiters } from '@/utils/parsing/consolidate-date';
 import { isNotRotated } from '@/utils/parsing/filter-rotated';
-import {
-  TransactionItem,
-  identifyTransactionItems,
-} from '@/utils/parsing/identify-transaction-items';
+import { TransactionItem } from '@/utils/parsing/identify-transaction-items';
+import { bankParserFactory, BankName } from '@/utils/parsing/bank-parsers';
 import { transformToViewport } from '@/utils/pdf';
 
 import pick from 'lodash/pick';
@@ -50,6 +48,11 @@ export const extractTransactionsFromPdf = async (
 
   const allTransactions: TransactionItem[] = [];
 
+  // Get the appropriate parser based on bank name
+  const bankName = (bank as BankName) || 'Unknown';
+  const parser = bankParserFactory.createParser(bankName);
+  console.log(`Using parser for bank: ${parser.bankName} (version: ${parser.version})`);
+
   // Extract transactions from all pages
   for (let pageNum = 1; pageNum <= numOfPages; pageNum++) {
     console.log('pageNum:', pageNum);
@@ -67,7 +70,7 @@ export const extractTransactionsFromPdf = async (
     const groupedByDelimiters = groupByDelimiters(nonRotated);
     // console.log('groupedByDelimiters:', groupedByDelimiters);
 
-    const transactions = identifyTransactionItems(groupedByDelimiters);
+    const transactions = parser.identifyTransactionItems(groupedByDelimiters);
     console.log('transactions:', transactions);
 
     allTransactions.push(...transactions);
