@@ -340,6 +340,57 @@ export function TransactionsPage() {
         </Paragraph>
       </div>
 
+      <div style={{ marginBottom: '24px' }}>
+        <Space>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={loadFromLocalStorage}
+            loading={loading}
+          >
+            Refresh
+          </Button>
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={handleDownloadJSON}
+            disabled={transactions.length === 0}
+          >
+            Export JSON
+          </Button>
+          <Popconfirm
+            title="Confirm overwrite"
+            description="Are you sure to replace contents in localStorage?"
+            onConfirm={handleOverwriteLocalStorage}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button icon={<SaveOutlined />}>Overwrite localStorage</Button>
+          </Popconfirm>
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={handleAssignCategories}
+            disabled={transactions.length === 0}
+          >
+            Assign categories
+          </Button>
+          <Popconfirm
+            title="Clear all auto-assigned categories"
+            description="Are you sure you want to delete all auto-assigned categories from transactions? This action cannot be undone."
+            onConfirm={handleClearCategories}
+            okText="Yes"
+            cancelText="No"
+            disabled={transactions.length === 0}
+          >
+            <Button
+              icon={<DeleteOutlined />}
+              danger
+              disabled={transactions.length === 0}
+            >
+              Clear assigned categories
+            </Button>
+          </Popconfirm>
+        </Space>
+      </div>
+
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} md={6}>
@@ -484,54 +535,6 @@ export function TransactionsPage() {
               />
             </div>
           </div>
-          <Space>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={loadFromLocalStorage}
-              loading={loading}
-            >
-              Refresh
-            </Button>
-            <Button
-              icon={<DownloadOutlined />}
-              onClick={handleDownloadJSON}
-              disabled={transactions.length === 0}
-            >
-              Export JSON
-            </Button>
-            <Popconfirm
-              title="Confirm overwrite"
-              description="Are you sure to replace contents in localStorage?"
-              onConfirm={handleOverwriteLocalStorage}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button icon={<SaveOutlined />}>Overwrite localStorage</Button>
-            </Popconfirm>
-            <Button
-              icon={<DownloadOutlined />}
-              onClick={handleAssignCategories}
-              disabled={transactions.length === 0}
-            >
-              Assign categories
-            </Button>
-            <Popconfirm
-              title="Clear all auto-assigned categories"
-              description="Are you sure you want to delete all auto-assigned categories from transactions? This action cannot be undone."
-              onConfirm={handleClearCategories}
-              okText="Yes"
-              cancelText="No"
-              disabled={transactions.length === 0}
-            >
-              <Button
-                icon={<DeleteOutlined />}
-                danger
-                disabled={transactions.length === 0}
-              >
-                Clear assigned categories
-              </Button>
-            </Popconfirm>
-          </Space>
         </div>
 
         <Table<TransactionDisplayItem>
