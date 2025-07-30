@@ -2,7 +2,7 @@ import {
   TextItemWithPositioning,
   TextItemWithPrevNext,
   TransactionItem,
-} from '@/utils/parsing/types';
+} from '@/features/parsing/types';
 
 import { parse } from 'date-fns';
 import { PDFPageProxy } from 'pdfjs-dist';

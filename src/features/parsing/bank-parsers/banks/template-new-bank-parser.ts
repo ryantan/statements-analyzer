@@ -1,9 +1,9 @@
-import { parseDayMonth, threeCharMonthNames } from '@/utils/dates';
 import {
   TextItemWithPrevNext,
   TransactionItem,
   WordItem,
-} from '@/utils/parsing/types';
+} from '@/features/parsing/types';
+import { parseDayMonth, threeCharMonthNames } from '@/utils/dates';
 
 import { BaseBankParser } from '../BaseParser';
 

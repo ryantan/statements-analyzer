@@ -1,10 +1,10 @@
-import { Transaction } from '@/features/transactions/types';
-import { BankName, bankParserFactory } from '@/utils/parsing/bank-parsers';
-import { isNotRotated } from '@/utils/parsing/filter-rotated';
+import { BankName, bankParserFactory } from '@/features/parsing/bank-parsers';
+import { isNotRotated } from '@/features/parsing/filter-rotated';
 import {
   TextItemWithPositioning,
   TransactionItem,
-} from '@/utils/parsing/types';
+} from '@/features/parsing/types';
+import { Transaction } from '@/features/transactions/types';
 import { transformToViewport } from '@/utils/pdf';
 
 import pick from 'lodash/pick';

@@ -1,8 +1,8 @@
 'use client';
 
+import { BankName, bankParserFactory } from '@/features/parsing/bank-parsers';
 import { Transaction } from '@/features/transactions/types';
 import { extractTransactionsFromPdf } from '@/features/upload/extractTransactionsFromPdf';
-import { bankParserFactory, BankName } from '@/utils/parsing/bank-parsers';
 
 import { useState } from 'react';
 
@@ -183,7 +183,7 @@ export function UploadPage() {
             <Form.Item label="Bank Name" name="bank">
               <Select
                 placeholder="Select bank"
-                options={bankParserFactory.getSupportedBanks().map(bank => ({
+                options={bankParserFactory.getSupportedBanks().map((bank) => ({
                   label: bank,
                   value: bank,
                 }))}

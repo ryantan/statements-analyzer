@@ -1,4 +1,4 @@
-import { TextItemWithPositioning } from '@/utils/parsing/types';
+import { TextItemWithPositioning } from '@/features/parsing/types';
 
 import { sortBy } from 'lodash';
 import groupBy from 'lodash/groupBy';
