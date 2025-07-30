@@ -3,6 +3,7 @@ import { Category } from '@/features/categories/types';
 import { useState } from 'react';
 
 import { Descriptions, Modal } from 'antd';
+import { format } from 'date-fns';
 
 import { TransactionDisplayItem } from '../types';
 
@@ -38,25 +39,20 @@ export const useTransactionDetailsModal = ({
       {selectedTransaction && (
         <Descriptions
           bordered
-          column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }}
+          column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 2, xs: 2 }}
           layout="vertical"
         >
-          <Descriptions.Item label="Date">
-            {selectedTransaction.dateFormatted}
-          </Descriptions.Item>
-          <Descriptions.Item label="Accounting Period">
-            {selectedTransaction.accountingDate
-              ? new Date(selectedTransaction.accountingDate).toLocaleDateString(
-                  'en-US',
-                  {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  }
-                )
+          <Descriptions.Item label="Date" span={1}>
+            {selectedTransaction.date
+              ? format(selectedTransaction.date, 'dd MMM yyyy')
               : 'N/A'}
           </Descriptions.Item>
-          <Descriptions.Item label="Description">
+          <Descriptions.Item label="Accounting Period" span={1}>
+            {selectedTransaction.accountingDate
+              ? format(selectedTransaction.accountingDate, 'dd MMM yyyy')
+              : 'N/A'}
+          </Descriptions.Item>
+          <Descriptions.Item label="Description" span={2}>
             {selectedTransaction.description.join(', ')}
           </Descriptions.Item>
           <Descriptions.Item label="Bank">
