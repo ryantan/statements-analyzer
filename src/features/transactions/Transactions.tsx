@@ -1,7 +1,7 @@
 'use client';
 
 import { DatePicker } from '@/components';
-import { useCategories } from '@/features/category/useCategories';
+import { useCategories } from '@/features/categories/useCategories';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
