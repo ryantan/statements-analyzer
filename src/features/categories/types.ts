@@ -3,4 +3,5 @@ export type Category = {
   name: string;
   description: string;
   color: string;
+  isRoot?: boolean;
 };
