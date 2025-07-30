@@ -1,7 +1,8 @@
 'use client';
 
-import { BankName, bankParserFactory } from '@/features/parsing/bank-parsers';
+import { bankParserFactory } from '@/features/parsing/bank-parsers';
 import { Transaction } from '@/features/transactions/types';
+import { useTransactions } from '@/features/transactions/useTransactions';
 import { extractTransactionsFromPdf } from '@/features/upload/extractTransactionsFromPdf';
 
 import { useState } from 'react';
@@ -32,6 +33,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 const { Title } = Typography;
 
 export function UploadPage() {
+  const { loadFromLocalStorage, setTransactions: saveTransactions } =
+    useTransactions();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
@@ -94,8 +97,20 @@ export function UploadPage() {
     setLoading(false);
   };
 
-  const handleOverwriteLocalStorage = () => {
-    localStorage.setItem('transactions', JSON.stringify(transactions));
+  const handleClearLocalStorage = () => {
+    saveTransactions([]);
+  };
+
+  const handleAppendToLocalStorage = () => {
+    const existingTransactions = loadFromLocalStorage();
+    if (!existingTransactions) {
+      console.error('Error loading transactions from localStorage!');
+      return;
+    }
+
+    existingTransactions.push(...transactions);
+    saveTransactions(existingTransactions);
+    message.success('Transactions saved to localStorage!').then();
   };
 
   const handleDownloadJSON = () => {
@@ -219,8 +234,24 @@ export function UploadPage() {
               <Popconfirm
                 title="Confirm overwrite"
                 description="Are you sure to replace contents in localStorage?"
-                onConfirm={handleOverwriteLocalStorage}
-                // onCancel={cancel}
+                onConfirm={handleClearLocalStorage}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  danger
+                  icon={<SaveOutlined />}
+                  style={{ marginTop: '16px', marginLeft: '8px' }}
+                >
+                  Clear localStorage
+                </Button>
+              </Popconfirm>
+            )}
+            {hasParsedTransactions && (
+              <Popconfirm
+                title="Confirm insert"
+                description="Are you sure to add new transactions to localStorage?"
+                onConfirm={handleAppendToLocalStorage}
                 okText="Yes"
                 cancelText="No"
               >
@@ -228,7 +259,7 @@ export function UploadPage() {
                   icon={<SaveOutlined />}
                   style={{ marginTop: '16px', marginLeft: '8px' }}
                 >
-                  Overwrite localStorage
+                  Add to localStorage
                 </Button>
               </Popconfirm>
             )}
