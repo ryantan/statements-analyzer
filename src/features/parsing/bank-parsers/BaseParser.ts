@@ -1,9 +1,9 @@
-import { groupBySortedBottom } from '@/utils/parsing/bank-parsers/helpers/groupBySortedBottom';
+import { groupBySortedBottom } from '@/features/parsing/bank-parsers/helpers/groupBySortedBottom';
 import {
   TextItemWithPositioning,
   TransactionItem,
   WordItem,
-} from '@/utils/parsing/types';
+} from '@/features/parsing/types';
 
 import { format } from 'date-fns/format';
 import { PDFPageProxy } from 'pdfjs-dist';

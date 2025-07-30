@@ -1,4 +1,4 @@
-import { TransactionItem } from '@/utils/parsing/types';
+import { TransactionItem } from '@/features/parsing/types';
 
 import { PDFPageProxy } from 'pdfjs-dist';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';

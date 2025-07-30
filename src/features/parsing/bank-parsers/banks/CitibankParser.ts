@@ -1,10 +1,10 @@
-import { parseDayMonth, threeCharMonthNames } from '@/utils/dates';
 import {
   TextItemWithPositioning,
   TextItemWithPrevNext,
   TransactionItem,
   WordItem,
-} from '@/utils/parsing/types';
+} from '@/features/parsing/types';
+import { parseDayMonth, threeCharMonthNames } from '@/utils/dates';
 
 import { PDFPageProxy } from 'pdfjs-dist';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
