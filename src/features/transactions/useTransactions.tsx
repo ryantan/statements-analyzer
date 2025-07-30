@@ -48,7 +48,9 @@ export const useTransactions = () => {
 
     const validTransactions = rawTransactions.filter(isValidTransaction);
     if (validTransactions.length === 0) {
-      return { error: 'No valid transactions found in the file.' };
+      console.warn('No valid transactions found in the file.');
+      message.warning('No valid transactions found in the file.');
+      // return { error: 'No valid transactions found in the file.' };
     }
 
     if (validTransactions.length !== rawTransactions.length) {
@@ -77,16 +79,21 @@ export const useTransactions = () => {
           parseFromString(storedTransactions);
         if (error) {
           message.error(error).then();
+          console.error(error);
           _setTransactions([]);
           return;
         }
         if (!parsedTransactions) {
           message.error('Got undefined response from parseFromString').then();
+          console.error('Got undefined response from parseFromString');
           _setTransactions([]);
           return;
         }
 
         _setTransactions(parsedTransactions);
+        console.log(
+          `Loaded ${parsedTransactions.length} transactions from storage`
+        );
         message.success(
           `Loaded ${parsedTransactions.length} transactions from storage`
         );
