@@ -23,6 +23,7 @@ import {
   CloseCircleOutlined,
   DeleteOutlined,
   DownloadOutlined,
+  EyeOutlined,
   FilterOutlined,
   ReloadOutlined,
   SaveOutlined,
@@ -49,6 +50,8 @@ import {
 } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { endOfDay, isAfter, isBefore, startOfDay } from 'date-fns';
+
+import { useTransactionDetailsModal } from './hooks/useTransactionDetailsModal';
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
@@ -79,6 +82,9 @@ export function TransactionsPage() {
   const { containerRef, availableHeight } = useAvailableHeight({
     additionalOffset: 124,
   });
+
+  const { handleViewDetails, TransactionDetailsModal } =
+    useTransactionDetailsModal({ categories });
 
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
@@ -481,6 +487,22 @@ export function TransactionsPage() {
         </span>
       ),
     },
+    {
+      title: 'View Details',
+      key: 'viewDetails',
+      width: 100,
+      align: 'center' as const,
+      render: (_, record: TransactionDisplayItem) => (
+        <Tooltip title="View transaction details">
+          <Button
+            type="text"
+            icon={<EyeOutlined />}
+            onClick={() => handleViewDetails(record)}
+            style={{ padding: '4px' }}
+          />
+        </Tooltip>
+      ),
+    },
   ];
 
   const totalAmount = processedTransactions.reduce(
@@ -794,6 +816,8 @@ export function TransactionsPage() {
           />
         </div>
       </Card>
+
+      <TransactionDetailsModal />
     </div>
   );
 }
