@@ -1,19 +1,27 @@
-import { threeCharMonthNames } from '@/utils/dates';
+import { parseDayMonth, threeCharMonthNames } from '@/utils/dates';
+import {
+  TextItemWithPrevNext,
+  TransactionItem,
+  WordItem,
+} from '@/utils/parsing/types';
 
-import { WordItem } from '../../consolidate-date';
-import { TransactionItem } from '../../identify-transaction-items';
-import { BaseBankParser } from '../base-parser';
+import { PDFPageProxy } from 'pdfjs-dist';
+import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-type TextItemWithPrevNext = WordItem & {
-  prev?: WordItem;
-  next?: WordItem;
-};
+import { groupByDelimiters } from '../../consolidate-date';
+import { BaseBankParser } from '../BaseParser';
 
 export class CitibankParser extends BaseBankParser {
   readonly bankName = 'Citibank';
   readonly version = '1.0.0';
 
-  identifyTransactionItems(itemsRaw: WordItem[]): TransactionItem[] {
+  identifyTransactionItems(
+    textItemsRaw: TextItem[],
+    page: PDFPageProxy
+  ): TransactionItem[] {
+    const itemsRaw = groupByDelimiters(textItemsRaw);
+    // console.log('groupedByDelimiters:', groupedByDelimiters);
+
     const transactions: TransactionItem[] = [];
 
     const items: TextItemWithPrevNext[] = itemsRaw.map((item, index) => {
@@ -65,9 +73,9 @@ export class CitibankParser extends BaseBankParser {
       );
 
       if (monthItem && amountItem) {
+        const date = parseDayMonth(dayItem.str, monthItem.str);
         const transaction = this.createTransactionItem(
-          dayItem,
-          monthItem,
+          date,
           amountItem,
           descriptionWords,
           currentY,

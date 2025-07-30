@@ -1,19 +1,22 @@
-import { threeCharMonthNames } from '@/utils/dates';
+import { TextItemWithPrevNext, TransactionItem } from '@/utils/parsing/types';
 
-import { WordItem } from '../../consolidate-date';
-import { TransactionItem } from '../../identify-transaction-items';
-import { BaseBankParser } from '../base-parser';
+import { parse } from 'date-fns';
+import { PDFPageProxy } from 'pdfjs-dist';
+import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-type TextItemWithPrevNext = WordItem & {
-  prev?: WordItem;
-  next?: WordItem;
-};
+import { BaseBankParser } from '../BaseParser';
 
 export class OCBCParser extends BaseBankParser {
   readonly bankName = 'OCBC';
   readonly version = '1.0.0';
 
-  identifyTransactionItems(itemsRaw: WordItem[]): TransactionItem[] {
+  identifyTransactionItems(
+    textItemsRaw: TextItem[],
+    page: PDFPageProxy
+  ): TransactionItem[] {
+    const itemsRaw = this.groupByProximity(textItemsRaw);
+    // console.log('itemsRaw:', itemsRaw);
+
     const transactions: TransactionItem[] = [];
 
     const items: TextItemWithPrevNext[] = itemsRaw.map((item, index) => {
@@ -24,15 +27,12 @@ export class OCBCParser extends BaseBankParser {
       };
       return itemWithPrevNext;
     });
+    console.log('items:', items);
 
-    // Find all day items - OCBC specific coordinates (adjust these based on actual OCBC format)
+    // Find all day items - OCBC specific coordinates
     const dayItems = items
-      .filter((item) => this.isBetween(item.left, 40, 50)) // Adjust coordinates for OCBC
-      .filter((item) => item.str.length === 2 && parseInt(item.str) > 0)
-      .filter((item) =>
-        threeCharMonthNames.includes(item.next?.str.toUpperCase() ?? '')
-      );
-
+      .filter((item) => this.isBetween(item.left, 57, 59)) // Adjust coordinates for OCBC
+      .filter((item) => item.str.length === 5 && item.str.match(/^\d\d|\d\d$/));
     console.log('OCBC dayItems:', dayItems);
 
     for (let i = 0; i < dayItems.length; i++) {
@@ -47,26 +47,27 @@ export class OCBCParser extends BaseBankParser {
       const candidateWords = items.filter(
         (item) => item.top >= currentY && item.bottom < nextY
       );
-
-      // Find month item - OCBC specific coordinates (adjust these)
-      const monthItem = candidateWords.find(
-        (item) => this.isBetween(item.left, 50, 65) // Adjust coordinates for OCBC
+      console.log(
+        `OCBC candidateWords between ${currentY} and ${nextY}:`,
+        candidateWords
       );
 
       // Find amount item - OCBC specific coordinates (adjust these)
       const amountItem = candidateWords.find(
-        (item) => this.isBetween(item.right, 550, 580) // Adjust coordinates for OCBC
+        (item) => this.isBetween(item.right, 544.73176068, 547.494946) // Adjust coordinates for OCBC
       );
+      console.log('OCBC amountItem:', amountItem);
 
       // Find description words left over.
       const descriptionWords = candidateWords.filter(
-        (item) => item !== dayItem && item !== monthItem && item !== amountItem
+        (item) => item !== dayItem && item !== amountItem
       );
 
-      if (monthItem && amountItem) {
+      if (amountItem) {
+        const date = parse(dayItem.str, 'dd/MM', new Date());
+
         const transaction = this.createTransactionItem(
-          dayItem,
-          monthItem,
+          date,
           amountItem,
           descriptionWords,
           currentY,
@@ -74,10 +75,7 @@ export class OCBCParser extends BaseBankParser {
         );
         transactions.push(transaction);
       } else {
-        console.log(
-          `${monthItem ? '' : 'monthItem'}${amountItem ? '' : 'amountItem'} not found:`,
-          dayItem
-        );
+        console.log(`${amountItem ? '' : 'amountItem'} not found:`, dayItem);
       }
     }
 

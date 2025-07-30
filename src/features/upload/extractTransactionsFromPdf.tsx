@@ -1,8 +1,8 @@
 import { Transaction } from '@/features/transactions/types';
+import { BankName, bankParserFactory } from '@/utils/parsing/bank-parsers';
 import { groupByDelimiters } from '@/utils/parsing/consolidate-date';
 import { isNotRotated } from '@/utils/parsing/filter-rotated';
 import { TransactionItem } from '@/utils/parsing/identify-transaction-items';
-import { bankParserFactory, BankName } from '@/utils/parsing/bank-parsers';
 import { transformToViewport } from '@/utils/pdf';
 
 import pick from 'lodash/pick';
@@ -51,14 +51,16 @@ export const extractTransactionsFromPdf = async (
   // Get the appropriate parser based on bank name
   const bankName = (bank as BankName) || 'Unknown';
   const parser = bankParserFactory.createParser(bankName);
-  console.log(`Using parser for bank: ${parser.bankName} (version: ${parser.version})`);
+  console.log(
+    `Using parser for bank: ${parser.bankName} (version: ${parser.version})`
+  );
 
   // Extract transactions from all pages
   for (let pageNum = 1; pageNum <= numOfPages; pageNum++) {
     console.log('pageNum:', pageNum);
     const page = await pdf.getPage(pageNum);
     const textContent = await page.getTextContent({
-      includeMarkedContent: false,
+      // includeMarkedContent: false,
     });
     // console.log('textContent:', textContent);
 
@@ -67,17 +69,15 @@ export const extractTransactionsFromPdf = async (
     const transformedItems = transformToViewport(page, textItems);
 
     const nonRotated = transformedItems.filter(isNotRotated);
-    const groupedByDelimiters = groupByDelimiters(nonRotated);
-    // console.log('groupedByDelimiters:', groupedByDelimiters);
 
-    const transactions = parser.identifyTransactionItems(groupedByDelimiters);
+    const transactions = parser.identifyTransactionItems(nonRotated, page);
     console.log('transactions:', transactions);
 
     allTransactions.push(...transactions);
   }
   console.log('allTransactions:', allTransactions);
 
-  return allTransactions.map((transaction) => 
+  return allTransactions.map((transaction) =>
     removeIntermediateProperties(transaction, bank, bankAccount, fileName)
   );
 };
