@@ -90,9 +90,12 @@ export const useTransactions = () => {
         message.success(
           `Loaded ${parsedTransactions.length} transactions from storage`
         );
+
+        return parsedTransactions;
       } else {
         _setTransactions([]);
         message.info('No transactions found in localStorage');
+        return [];
       }
     } catch (error) {
       console.error('Error loading transactions:', error);
