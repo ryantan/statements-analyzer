@@ -8,7 +8,10 @@ import { AccountingDateCell } from '@/features/transactions/components/Accountin
 import { CategoryCell } from '@/features/transactions/components/CategoryCell';
 import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import { TransactionDisplayItem } from '@/features/transactions/types';
-import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
+import {
+  isNotCCPayments,
+  isNotRebates,
+} from '@/features/transactions/utils/isNotCCPayments';
 import {
   isClaimable,
   isNotClaimable,
@@ -90,6 +93,7 @@ export function TransactionsPage() {
   const processedTransactions = useMemo(() => {
     return transactions
       .filter(isNotCCPayments)
+      .filter(isNotRebates)
       .map<TransactionDisplayItem>((transaction) => ({
         ...transaction,
         resolvedCategoryKey:

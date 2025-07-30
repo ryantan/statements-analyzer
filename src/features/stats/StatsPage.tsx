@@ -6,7 +6,10 @@ import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick
 import { renderBarLabel } from '@/features/stats/components/renderBarLabel';
 import { renderBarTooltip } from '@/features/stats/components/renderBarTooltip';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
-import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
+import {
+  isNotCCPayments,
+  isNotRebates,
+} from '@/features/transactions/utils/isNotCCPayments';
 import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
 
 import { useMemo, useState } from 'react';
@@ -80,6 +83,7 @@ export function StatsPage() {
   const processedTransactions = useMemo(() => {
     return transactions
       .filter(isNotCCPayments)
+      .filter(isNotRebates)
       .filter(isNotClaimable)
       .map<TransactionForStats>((item) => {
         const categoryKey = item.categoryKey || item.autoCategoryKey;
