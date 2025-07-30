@@ -1,7 +1,7 @@
 'use client';
 
 import { DatePicker } from '@/components';
-import { useCategories } from '@/features/category/useCategories';
+import { useCategories } from '@/features/categories/useCategories';
 import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick';
 import { renderBarLabel } from '@/features/stats/components/renderBarLabel';
 import { renderBarTooltip } from '@/features/stats/components/renderBarTooltip';

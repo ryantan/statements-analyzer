@@ -1,6 +1,6 @@
 'use client';
 
-import { Category } from '@/features/category/types';
+import { Category } from '@/features/categories/types';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { DatePicker } from '@/components';
-import { useCategories } from '@/features/category/useCategories';
+import { useCategories } from '@/features/categories/useCategories';
 import { renderStackBarTooltip } from '@/features/monthly/components/renderStackBarTooltip';
 import { useCategoryFilter } from '@/features/monthly/hooks/useCategoryFilter';
 import { useTransactions } from '@/features/transactions/TransactionsContext';

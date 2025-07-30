@@ -1,6 +1,6 @@
 'use client';
 
-import { useCategories } from '@/features/category/useCategories';
+import { useCategories } from '@/features/categories/useCategories';
 import { useAvailableHeight } from '@/utils/hooks/useAvailableHeight';
 
 import { useState } from 'react';

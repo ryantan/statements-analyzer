@@ -1,6 +1,6 @@
 'use client';
 
-import { Category } from '@/features/category/types';
+import { Category } from '@/features/categories/types';
 import { TransactionDisplayItem } from '@/features/transactions/types';
 
 import { useState } from 'react';
