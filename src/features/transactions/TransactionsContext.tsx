@@ -9,7 +9,7 @@ interface TransactionsContextType {
   transactions: Transaction[];
   setTransactions: (transactions: Transaction[]) => void;
   loadTransactions: () => void;
-  loadFromFile: (fileContent: string) => void;
+  loadFromFile: (fileContent: string, append: boolean) => void;
   isLoadingTransactions: boolean;
   updateTransactionItem: (
     key: string,

@@ -288,7 +288,36 @@ export function TransactionsPage() {
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
-        loadFromFile(content);
+        loadFromFile(content, false);
+      } catch (error) {
+        message.error(
+          'Failed to parse JSON file. Please check the file format.'
+        );
+        console.error('Import error:', error);
+      }
+    };
+
+    reader.onerror = () => {
+      message.error('Failed to read the file.');
+    };
+
+    reader.readAsText(file);
+
+    // Reset the input value so the same file can be selected again
+    event.target.value = '';
+  };
+
+  const handleInsertJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        loadFromFile(content, true);
       } catch (error) {
         message.error(
           'Failed to parse JSON file. Please check the file format.'
@@ -553,6 +582,21 @@ export function TransactionsPage() {
             accept=".json"
             style={{ display: 'none' }}
             onChange={handleImportJSON}
+          />
+          <Button
+            icon={<UploadOutlined />}
+            onClick={() =>
+              document.getElementById('insert-json-input')?.click()
+            }
+          >
+            Insert JSON
+          </Button>
+          <input
+            id="insert-json-input"
+            type="file"
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={handleInsertJSON}
           />
           <Popconfirm
             title="Confirm overwrite"

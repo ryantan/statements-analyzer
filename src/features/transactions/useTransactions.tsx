@@ -113,7 +113,7 @@ export const useTransactions = () => {
     }
   };
 
-  const loadFromFile = (fileContent: string) => {
+  const loadFromFile = (fileContent: string, append: boolean) => {
     setLoading(true);
     try {
       if (!fileContent) {
@@ -131,7 +131,13 @@ export const useTransactions = () => {
         return;
       }
 
-      setTransactions(parsedTransactions);
+      if (append) {
+        setTransactions([...transactions, ...parsedTransactions]);
+      } else {
+        // Overwrite!
+        setTransactions(parsedTransactions);
+      }
+
       message
         .success(`Loaded ${parsedTransactions.length} transactions from file`)
         .then();
