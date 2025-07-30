@@ -1,3 +1,4 @@
+import { groupBySortedBottom } from '@/utils/parsing/bank-parsers/helpers/groupBySortedBottom';
 import {
   TextItemWithPositioning,
   TransactionItem,
@@ -5,10 +6,7 @@ import {
 } from '@/utils/parsing/types';
 
 import { format } from 'date-fns/format';
-import { sortBy } from 'lodash';
-import groupBy from 'lodash/groupBy';
 import { PDFPageProxy } from 'pdfjs-dist';
-import { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { v4 as uuidv4 } from 'uuid';
 
 import { BankParser } from './types';
@@ -21,7 +19,7 @@ export abstract class BaseBankParser implements BankParser {
    * Abstract method that each bank must implement to identify transaction items
    */
   abstract identifyTransactionItems(
-    itemsRaw: WordItem[],
+    itemsRaw: TextItemWithPositioning[],
     page: PDFPageProxy
   ): TransactionItem[];
 
@@ -44,13 +42,87 @@ export abstract class BaseBankParser implements BankParser {
     return this.isNear(x, min, tolerance) || this.isNear(x, max, tolerance);
   }
 
+  protected groupBySortedBottom(
+    items: TextItemWithPositioning[]
+  ): Map<number, TextItemWithPositioning[]> {
+    return groupBySortedBottom(items);
+  }
+
   /**
-   * Group TextItems by proximity.
+   * Group by EOL property.
+   *
+   * Use this for pdfs which splits each character as 1 TextItem.
    *
    * @param rawItems
    * @protected
    */
-  protected groupByProximity(rawItems: TextItem[]): WordItem[] {
+  protected groupByDelimiters(rawItems: TextItemWithPositioning[]): WordItem[] {
+    const allGroups: WordItem[] = [];
+
+    // Groups per line.
+    let groups: WordItem[] = [];
+    // Keeps track of current open group.
+    let currentGroup: TextItemWithPositioning[] = [];
+
+    const closeGroup = () => {
+      const groupString = currentGroup.map((item) => item.str).join('');
+      const wordItem: WordItem = {
+        ...currentGroup[0],
+        str: groupString,
+        items: currentGroup,
+        left: currentGroup[0].left,
+        right: currentGroup[currentGroup.length - 1].right,
+        top: currentGroup[0].top,
+        bottom: currentGroup[0].bottom,
+        hasEOL: true,
+      };
+
+      groups.push(wordItem);
+      currentGroup = [];
+    };
+
+    const rawItemsWithoutBlanks = rawItems.filter((item) => {
+      return item.str !== '' && item.width !== 0;
+    });
+
+    const lines = groupBySortedBottom(rawItemsWithoutBlanks);
+
+    for (const [bottom, items] of lines.entries()) {
+      console.log(`[groupByDelimiters] processing line ${bottom}`);
+      // console.log(`[groupByDelimiters] sorted left to right:`, items);
+
+      // Process a line.
+      for (const item of items) {
+        if (item.str === ' ' || item.hasEOL) {
+          if (currentGroup.length > 0) {
+            closeGroup();
+          }
+        } else {
+          currentGroup.push(item);
+        }
+      }
+
+      if (currentGroup.length > 0) {
+        closeGroup();
+      }
+
+      console.log(`[groupByDelimiters] groups on ${bottom}:`, groups);
+      allGroups.push(...groups);
+      groups = [];
+    }
+
+    return allGroups;
+  }
+
+  /**
+   * Group TextItems by proximity.
+   *
+   * Use this for pdfs that store each word in a TextItem.
+   *
+   * @param rawItems
+   * @protected
+   */
+  protected groupByProximity(rawItems: TextItemWithPositioning[]): WordItem[] {
     const allGroups: WordItem[] = [];
 
     // Groups per line.
@@ -124,28 +196,14 @@ export abstract class BaseBankParser implements BankParser {
     const rawItemsWithoutBlanks = rawItems.filter((item) => {
       return item.str !== '' && item.width !== 0;
     });
-    // .filter((item) => {
-    //   return !(item.str === ' ' && item.width > 12);
-    // });
-    const itemsWithPositioning =
-      rawItemsWithoutBlanks.map<TextItemWithPositioning>((item) => ({
-        ...item,
-        left: item.transform[4],
-        right: item.transform[4] + item.width,
-        top: item.transform[5] - item.height,
-        bottom: item.transform[5],
-      }));
 
-    // We use bottom, as spaces have 0 height so they would have different top as characters, even when on the same line.
-    const sortedByBottom = sortBy(itemsWithPositioning, 'bottom');
-    const groupedByLines = groupBy(sortedByBottom, 'bottom');
-    console.log('[groupByProximity] groupedByLines:', groupedByLines);
+    const lines = this.groupBySortedBottom(rawItemsWithoutBlanks);
 
-    // Process a line.
-    for (const [bottom, itemsInLine] of Object.entries(groupedByLines)) {
-      const items = sortBy(itemsInLine, 'left');
-      console.log('[groupByProximity] sorted left to right:', items);
+    for (const [bottom, items] of lines.entries()) {
+      console.log(`[groupByProximity] processing line ${bottom}`);
+      // console.log('[groupByProximity] sorted left to right:', items);
 
+      // Process a line.
       for (const item of items) {
         if (lastItemInGroup) {
           const isNearHorizontal = this.isNear(item.left, lastItemRight, 0.5);
@@ -200,14 +258,13 @@ export abstract class BaseBankParser implements BankParser {
     const year = date.getMonth() === 11 ? 2024 : 2025;
     date.setFullYear(year);
 
-    const groupedByY = groupBy(descriptionWords, 'bottom');
-    const description = Object.values(groupedByY).map((items) =>
-      items.map((textItem) => textItem.str).join(' ')
+    const description = [...groupBySortedBottom(descriptionWords).values()].map(
+      (items) => items.map((textItem) => textItem.str).join(' ')
     );
 
     return {
       key: uuidv4(),
-      day: date.getDay().toString(),
+      day: format(date, 'd'),
       month: format(date, 'MMM').toUpperCase(),
       year,
       date,
