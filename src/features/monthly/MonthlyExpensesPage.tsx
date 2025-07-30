@@ -5,7 +5,10 @@ import { useCategories } from '@/features/categories/useCategories';
 import { renderStackBarTooltip } from '@/features/monthly/components/renderStackBarTooltip';
 import { useCategoryFilter } from '@/features/monthly/hooks/useCategoryFilter';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
-import { isNotCCPayments } from '@/features/transactions/utils/isNotCCPayments';
+import {
+  isNotCCPayments,
+  isNotRebates,
+} from '@/features/transactions/utils/isNotCCPayments';
 import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
 
 import { useMemo, useState } from 'react';
@@ -58,6 +61,7 @@ export function MonthlyExpensesPage() {
   const processedTransactions = useMemo(() => {
     return transactions
       .filter(isNotCCPayments)
+      .filter(isNotRebates)
       .filter(isNotClaimable)
       .map((item) => {
         const categoryKey = item.categoryKey || item.autoCategoryKey;
