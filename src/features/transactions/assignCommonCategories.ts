@@ -102,6 +102,8 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'household-appliances';
     } else if (descriptionAll.includes('IKEA SINGAPORE')) {
       newCategoryKey = 'household-other';
+    } else if (descriptionAll.includes('IPP IKEA')) {
+      newCategoryKey = 'household-other';
     } else if (descriptionAll.includes('NITORI')) {
       newCategoryKey = 'household-other';
     } else if (descriptionAll.includes('PHOONHUAT')) {
@@ -323,9 +325,15 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'software';
     } else if (descriptionAll.includes('STEAM PURCHASE')) {
       newCategoryKey = 'software';
+    } else if (descriptionAll.includes('APPLE.COM/BILL')) {
+      newCategoryKey = 'software';
+    } else if (descriptionAll.includes('GOOGLE ONE')) {
+      newCategoryKey = 'software';
     } else if (descriptionAll.includes('NETFLIX.COM')) {
       newCategoryKey = 'software';
     } else if (descriptionAll.includes('DISNEY PLUS')) {
+      newCategoryKey = 'software';
+    } else if (descriptionAll.includes('TIA NEWS SUBSCRIP')) {
       newCategoryKey = 'software';
     } else if (descriptionAll.includes('GENDOTXYZ')) {
       newCategoryKey = 'software';
@@ -387,6 +395,8 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'education-kids';
     } else if (descriptionAll.includes('POPULAR BOOK')) {
       newCategoryKey = 'kids-toys-books';
+    } else if (descriptionAll.includes('PACIFIC BOOKSTORES')) {
+      newCategoryKey = 'kids-toys-books';
     } else if (descriptionAll.includes('THE GREEN PARTY')) {
       newCategoryKey = 'kids-toys-books';
     } else if (descriptionAll.includes('TIGER FAMILY')) {
@@ -403,7 +413,11 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'clothes';
     } else if (descriptionAll.includes('INSURANCE')) {
       newCategoryKey = 'insurance';
+    } else if (descriptionAll.includes('PRUDENTIAL')) {
+      newCategoryKey = 'insurance';
     } else if (descriptionAll.includes('GREAT EASTERN')) {
+      newCategoryKey = 'insurance';
+    } else if (descriptionAll.includes('$1,454.50')) {
       newCategoryKey = 'insurance';
     } else if (descriptionAll.includes('AMAZE* WALLET TOPUP')) {
       newCategoryKey = 'others-fees';
@@ -417,6 +431,8 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'loans';
     } else if (descriptionAll.includes('CITI FLEXIBILL')) {
       newCategoryKey = 'loans';
+    } else if (descriptionAll.includes('INTEREST') && item.amount > 0) {
+      newCategoryKey = 'loans';
     } else if (descriptionAll.includes('MYICA')) {
       newCategoryKey = 'government';
     } else if (descriptionAll.includes('MOM-WPD')) {
@@ -425,11 +441,9 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'donations';
     } else if (descriptionAll.includes('FACEBK *')) {
       newCategoryKey = 'scams';
-    } else if (descriptionAll.includes('INTEREST')) {
-      newCategoryKey = 'interest';
     } else if (descriptionAll.includes('FOREIGN AMOUNT')) {
       newCategoryKey = 'holiday-others';
-    } else if (descriptionAll.includes('CCY CONVERSION FEE')) {
+    } else if (descriptionAll.includes('CCY CONVERSION')) {
       newCategoryKey = 'holiday-others';
     }
     return { ...item, autoCategoryKey: newCategoryKey };
