@@ -2,15 +2,12 @@
 export type { BankParser, BankParserFactory, BankName } from './types';
 
 // Base classes
-export { BaseBankParser } from './base-parser';
+export { BaseBankParser } from './BaseParser';
 
 // Concrete parsers
-export { CitibankParser } from './banks/citibank-parser';
-export { OCBCParser } from './banks/ocbc-parser';
-export { UnknownBankParser } from './unknown-parser';
+export { CitibankParser } from './banks/CitibankParser';
+export { OCBCParser } from './banks/OCBCParser';
+export { UnknownBankParser } from './banks/UnknownBankParser';
 
 // Factory
-export {
-  BankParserFactoryImpl,
-  bankParserFactory,
-} from './bank-parser-factory';
+export { BankParserFactoryImpl, bankParserFactory } from './BankParserFactory';

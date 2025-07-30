@@ -1,12 +1,11 @@
-import { TransactionItem } from '../identify-transaction-items';
-import { WordItem } from '../consolidate-date';
-import { BaseBankParser } from './base-parser';
-import { threeCharMonthNames } from '@/utils/dates';
+import { parseDayMonth, threeCharMonthNames } from '@/utils/dates';
+import {
+  TextItemWithPrevNext,
+  TransactionItem,
+  WordItem,
+} from '@/utils/parsing/types';
 
-type TextItemWithPrevNext = WordItem & {
-  prev?: WordItem;
-  next?: WordItem;
-};
+import { BaseBankParser } from '../BaseParser';
 
 export class UnknownBankParser extends BaseBankParser {
   readonly bankName = 'Unknown';
@@ -31,9 +30,9 @@ export class UnknownBankParser extends BaseBankParser {
       .filter((item) =>
         threeCharMonthNames.includes(item.next?.str.toUpperCase() ?? '')
       );
-    
+
     console.log('Unknown bank dayItems:', dayItems);
-    
+
     for (let i = 0; i < dayItems.length; i++) {
       const dayItem = dayItems[i];
       const nextDayItem = dayItems[i + 1];
@@ -58,9 +57,9 @@ export class UnknownBankParser extends BaseBankParser {
       );
 
       if (monthItem && amountItem) {
+        const date = parseDayMonth(dayItem.str, monthItem.str);
         const transaction = this.createTransactionItem(
-          dayItem,
-          monthItem,
+          date,
           amountItem,
           descriptionWords,
           currentY,
@@ -77,4 +76,4 @@ export class UnknownBankParser extends BaseBankParser {
 
     return transactions;
   }
-} 
+}

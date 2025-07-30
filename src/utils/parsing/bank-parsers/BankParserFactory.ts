@@ -1,7 +1,7 @@
-import { CitibankParser } from './banks/citibank-parser';
-import { OCBCParser } from './banks/ocbc-parser';
+import { CitibankParser } from './banks/CitibankParser';
+import { OCBCParser } from './banks/OCBCParser';
+import { UnknownBankParser } from './banks/UnknownBankParser';
 import { BankName, BankParser, BankParserFactory } from './types';
-import { UnknownBankParser } from './unknown-parser';
 
 export class BankParserFactoryImpl implements BankParserFactory {
   private parsers: Map<BankName, BankParser> = new Map();

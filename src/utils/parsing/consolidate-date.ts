@@ -1,3 +1,5 @@
+import { WordItem } from '@/utils/parsing/types';
+
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
 // interface Item {
@@ -5,14 +7,6 @@ import { TextItem } from 'pdfjs-dist/types/src/display/api';
 //   transform: number[];
 //   hasEOL?: boolean;
 // }
-
-export type WordItem = TextItem & {
-  items: TextItem[];
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-};
 
 // export function consolidateDate(items: TextItem[]): TextItem[] {
 //   const result: TextItem[] = [];

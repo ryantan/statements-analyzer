@@ -13,12 +13,12 @@ This directory contains the implementation of a **Strategy Pattern** combined wi
 ### Key Components
 
 - `types.ts` - Defines interfaces and types
-- `base-parser.ts` - Abstract base class with common functionality
-- `citibank-parser.ts` - Citibank-specific implementation
-- `ocbc-parser.ts` - OCBC-specific implementation
-- `unknown-parser.ts` - Fallback parser for unknown banks
-- `bank-parser-factory.ts` - Factory for creating appropriate parsers
-- `template-new-bank-parser.ts` - Template for adding new banks
+- `BaseParser.ts` - Abstract base class with common functionality
+- `banks/CitibankParser.ts` - Citibank-specific implementation
+- `banks/OcbcParser.ts` - OCBC-specific implementation
+- `banks/UnknownParser.ts` - Fallback parser for unknown banks
+- `BankParserFactory.ts` - Factory for creating appropriate parsers
+- `banks/template-new-bank-parser.ts` - Template for adding new banks
 
 ## How It Works
 
@@ -31,7 +31,7 @@ This directory contains the implementation of a **Strategy Pattern** combined wi
 
 ### Step 1: Create Parser Class
 
-Copy `template-new-bank-parser.ts` and rename it to your bank (e.g., `dbs-parser.ts`):
+Copy `template-new-bank-parser.ts` and rename it to your bank (e.g., `DBSParser.ts`):
 
 ```typescript
 export class DBSParser extends BaseBankParser {
