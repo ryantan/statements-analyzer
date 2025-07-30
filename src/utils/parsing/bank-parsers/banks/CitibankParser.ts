@@ -1,5 +1,6 @@
 import { parseDayMonth, threeCharMonthNames } from '@/utils/dates';
 import {
+  TextItemWithPositioning,
   TextItemWithPrevNext,
   TransactionItem,
   WordItem,
@@ -8,7 +9,6 @@ import {
 import { PDFPageProxy } from 'pdfjs-dist';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-import { groupByDelimiters } from '../../consolidate-date';
 import { BaseBankParser } from '../BaseParser';
 
 export class CitibankParser extends BaseBankParser {
@@ -16,11 +16,11 @@ export class CitibankParser extends BaseBankParser {
   readonly version = '1.0.0';
 
   identifyTransactionItems(
-    textItemsRaw: TextItem[],
+    textItemsRaw: TextItemWithPositioning[],
     page: PDFPageProxy
   ): TransactionItem[] {
-    const itemsRaw = groupByDelimiters(textItemsRaw);
-    // console.log('groupedByDelimiters:', groupedByDelimiters);
+    const itemsRaw = this.groupByDelimiters(textItemsRaw);
+    console.log('[CitibankParser] itemsRaw:', itemsRaw);
 
     const transactions: TransactionItem[] = [];
 
@@ -56,6 +56,7 @@ export class CitibankParser extends BaseBankParser {
       const candidateWords = items.filter(
         (item) => item.top >= currentY && item.bottom < nextY
       );
+      console.log('candidateWords:', candidateWords);
 
       // Find month item (x near 60, same y as day) - Citibank specific coordinates
       const monthItem = candidateWords.find((item) =>

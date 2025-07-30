@@ -1,8 +1,11 @@
-import { TextItemWithPrevNext, TransactionItem } from '@/utils/parsing/types';
+import {
+  TextItemWithPositioning,
+  TextItemWithPrevNext,
+  TransactionItem,
+} from '@/utils/parsing/types';
 
 import { parse } from 'date-fns';
 import { PDFPageProxy } from 'pdfjs-dist';
-import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
 import { BaseBankParser } from '../BaseParser';
 
@@ -11,11 +14,24 @@ export class OCBCParser extends BaseBankParser {
   readonly version = '1.0.0';
 
   identifyTransactionItems(
-    textItemsRaw: TextItem[],
+    textItemsRaw: TextItemWithPositioning[],
     page: PDFPageProxy
   ): TransactionItem[] {
     const itemsRaw = this.groupByProximity(textItemsRaw);
-    // console.log('itemsRaw:', itemsRaw);
+    // console.log('[OCBCParser] Grouped items:', itemsRaw);
+
+    const indexOfFirstTransactionsTable = itemsRaw.findIndex((item) =>
+      item.str.startsWith('TRANSACTION DATE')
+    );
+    console.log(
+      '[OCBCParser] indexOfFirstTransactionsTable:',
+      indexOfFirstTransactionsTable
+    );
+    if (indexOfFirstTransactionsTable === -1) {
+      return [];
+    }
+    itemsRaw.splice(0, indexOfFirstTransactionsTable);
+    console.log('[OCBCParser] Grouped items:', itemsRaw);
 
     const transactions: TransactionItem[] = [];
 

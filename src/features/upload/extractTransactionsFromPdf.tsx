@@ -1,8 +1,10 @@
 import { Transaction } from '@/features/transactions/types';
 import { BankName, bankParserFactory } from '@/utils/parsing/bank-parsers';
-import { groupByDelimiters } from '@/utils/parsing/consolidate-date';
 import { isNotRotated } from '@/utils/parsing/filter-rotated';
-import { TransactionItem } from '@/utils/parsing/identify-transaction-items';
+import {
+  TextItemWithPositioning,
+  TransactionItem,
+} from '@/utils/parsing/types';
 import { transformToViewport } from '@/utils/pdf';
 
 import pick from 'lodash/pick';
@@ -70,7 +72,19 @@ export const extractTransactionsFromPdf = async (
 
     const nonRotated = transformedItems.filter(isNotRotated);
 
-    const transactions = parser.identifyTransactionItems(nonRotated, page);
+    const itemsWithPositioning = nonRotated.map<TextItemWithPositioning>(
+      (item) => ({
+        ...item,
+        left: item.transform[4],
+        right: item.transform[4] + item.width,
+        top: item.transform[5] - item.height,
+        bottom: item.transform[5],
+      })
+    );
+    const transactions = parser.identifyTransactionItems(
+      itemsWithPositioning,
+      page
+    );
     console.log('transactions:', transactions);
 
     allTransactions.push(...transactions);
