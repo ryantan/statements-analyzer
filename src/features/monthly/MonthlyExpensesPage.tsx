@@ -67,7 +67,7 @@ export function MonthlyExpensesPage() {
         const categoryKey = item.categoryKey || item.autoCategoryKey;
         let parentCategoryKey = 'unknown';
         if (categoryKey) {
-          parentCategoryKey = categoryKey.split('-')[0];
+          parentCategoryKey = categoryKey.split('/')[0];
         }
 
         return {
