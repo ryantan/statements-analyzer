@@ -86,6 +86,9 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'shopping/online';
     } else if (descriptionAll.includes('SHEIN ')) {
       newCategoryKey = 'shopping/online';
+    } else if (descriptionAll.includes('ONE-TECH.SG')) {
+      // Shopee shop
+      newCategoryKey = 'shopping/online';
     } else if (descriptionAll.includes('GIORDANO')) {
       newCategoryKey = 'shopping/offline';
     } else if (descriptionAll.includes('ISETAN')) {
@@ -237,6 +240,14 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'food/eating-out';
     } else if (descriptionAll.includes('ANIPLUS SINGAPORE')) {
       newCategoryKey = 'food/eating-out';
+    } else if (descriptionAll.includes('REN LE FANG')) {
+      newCategoryKey = 'food/eating-out';
+    } else if (descriptionAll.includes('TASHDASH')) {
+      // Super big burgers at Haji lane
+      newCategoryKey = 'food/eating-out';
+    } else if (descriptionAll.includes('GRUPOALEGRIA')) {
+      // Latin Asian cuisine restaurant (Grupo Alegria Pte Ltd)
+      newCategoryKey = 'food/eating-out';
     } else if (descriptionAll.includes("AUNTIE ANNE'S")) {
       newCategoryKey = 'food/snacks';
     } else if (descriptionAll.includes('TORI-Q')) {
@@ -255,6 +266,11 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       // Dessert place at Serangoon gardens
       newCategoryKey = 'food/snacks';
     } else if (descriptionAll.includes('TANG HENG HUAT')) {
+      newCategoryKey = 'food/snacks';
+    } else if (descriptionAll.includes('KANG JI SUGAR COATED')) {
+      newCategoryKey = 'food/snacks';
+    } else if (descriptionAll.includes('ROLLNEY SINGAPORE')) {
+      // Cold dessert place at vivo
       newCategoryKey = 'food/snacks';
     } else if (descriptionAll.includes('THE COFFEE BEAN')) {
       newCategoryKey = 'food/drinks';
@@ -282,11 +298,17 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       newCategoryKey = 'food/drinks';
     } else if (descriptionAll.includes('KOPIFELLAS')) {
       newCategoryKey = 'food/drinks';
+    } else if (descriptionAll.includes('THE TREND')) {
+      // Cafe beside Rhythm In Me
+      newCategoryKey = 'food/drinks';
     } else if (descriptionAll.includes('CHICHA SAN')) {
       newCategoryKey = 'food/drinks';
     } else if (descriptionAll.includes('IJOOZ')) {
       newCategoryKey = 'food/drinks';
     } else if (descriptionAll.includes('APAC VENDING')) {
+      newCategoryKey = 'food/drinks';
+    } else if (descriptionAll.includes('ADAMO ENTERPRISE')) {
+      // Vending machine in Kidztopia
       newCategoryKey = 'food/drinks';
     } else if (descriptionAll.includes(' VENDING ')) {
       newCategoryKey = 'food/drinks';
@@ -316,8 +338,17 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       // World of blocks.
       newCategoryKey = 'entertainment/playground';
     } else if (descriptionAll.includes('WORLD OF PAWS')) {
-      newCategoryKey = 'entertainment/playground';
+      newCategoryKey = 'entertainment/others';
+    } else if (descriptionAll.includes('ME CAFE GAMES')) {
+      // Cat cafe at Orchard gateway
+      newCategoryKey = 'entertainment/others';
     } else if (descriptionAll.includes('WALKINGONSUNSHINE')) {
+      newCategoryKey = 'entertainment/others';
+    } else if (
+      descriptionAll.includes('BEAU') &&
+      descriptionAll.includes('ONLINE')
+    ) {
+      // Pug dog cafe at Haji lane
       newCategoryKey = 'entertainment/others';
     } else if (descriptionAll.includes('CLAYFUL.SG')) {
       newCategoryKey = 'entertainment/others';
@@ -344,28 +375,31 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
     } else if (descriptionAll.includes('GENDOTXYZ')) {
       newCategoryKey = 'software';
     } else if (descriptionAll.includes('KSKIN')) {
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/others';
     } else if (descriptionAll.includes('KIMAGE SALON')) {
-      newCategoryKey = 'health';
-    } else if (descriptionAll.includes('CHEN KANG WELLNESS')) {
-      newCategoryKey = 'health';
-    } else if (descriptionAll.includes(' SPA ')) {
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/others';
     } else if (descriptionAll.includes('NOVITA')) {
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/others';
+    } else if (descriptionAll.includes('CHEN KANG WELLNESS')) {
+      newCategoryKey = 'health/spa';
+    } else if (descriptionAll.includes('HT 1 PTE LTD')) {
+      // Healing touch spa
+      newCategoryKey = 'health/spa';
+    } else if (descriptionAll.includes(' SPA ')) {
+      newCategoryKey = 'health/spa';
     } else if (descriptionAll.includes('DECATHLON')) {
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/sports';
     } else if (descriptionAll.includes('INMERSPLAY')) {
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/sports';
     } else if (descriptionAll.includes(' INMERS ')) {
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/sports';
     } else if (descriptionAll.includes('SHOPBACK INM SINGAPORE')) {
       // Guessing INMERSPLAY
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/sports';
     } else if (descriptionAll.includes('GRIDDY GRID')) {
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/sports';
     } else if (descriptionAll.includes('GRIDDYGRID')) {
-      newCategoryKey = 'health';
+      newCategoryKey = 'health/sports';
     } else if (descriptionAll.includes('DING CATERS')) {
       newCategoryKey = 'party';
     } else if (descriptionAll.includes('ELSIESKITCHEN')) {
@@ -408,6 +442,8 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
     } else if (descriptionAll.includes('TIGER FAMILY')) {
       newCategoryKey = 'education/toys-books';
     } else if (descriptionAll.includes('TFORTOYS')) {
+      newCategoryKey = 'education/toys-books';
+    } else if (descriptionAll.includes('WWW.SPLASHLE')) {
       newCategoryKey = 'education/toys-books';
     } else if (descriptionAll.includes('SP SERVICES')) {
       newCategoryKey = 'utilities';
