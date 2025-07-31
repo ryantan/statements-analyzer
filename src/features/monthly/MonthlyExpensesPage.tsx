@@ -5,22 +5,10 @@ import { useCategories } from '@/features/categories/useCategories';
 import { renderStackBarTooltip } from '@/features/monthly/components/renderStackBarTooltip';
 import { useCategoryFilter } from '@/features/monthly/hooks/useCategoryFilter';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
-import {
-  isNotCCPayments,
-  isNotRebates,
-} from '@/features/transactions/utils/isNotCCPayments';
-import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
 
 import { useMemo, useState } from 'react';
 
-import {
-  // Keep vertical
-  Card,
-  Col,
-  Row,
-  Statistic,
-  Typography,
-} from 'antd';
+import { Card, Col, Row, Statistic, Typography } from 'antd';
 import {
   endOfDay,
   format,
@@ -57,30 +45,9 @@ export function MonthlyExpensesPage() {
     null
   );
 
-  // Process transactions
-  const processedTransactions = useMemo(() => {
-    return transactions
-      .filter(isNotCCPayments)
-      .filter(isNotRebates)
-      .filter(isNotClaimable)
-      .map((item) => {
-        const categoryKey = item.categoryKey || item.autoCategoryKey;
-        let parentCategoryKey = 'unknown';
-        if (categoryKey) {
-          parentCategoryKey = categoryKey.split('/')[0];
-        }
-
-        return {
-          ...item,
-          parentCategoryKey: parentCategoryKey,
-          resolvedDate: item.accountingDate || item.date,
-        };
-      });
-  }, [transactions]);
-
   // Filter transactions by selected date range
   const filteredTransactions = useMemo(() => {
-    let filtered = [...processedTransactions];
+    let filtered = [...transactions];
 
     if (dateRange && dateRange[0] && dateRange[1]) {
       const startDate = startOfDay(dateRange[0]);
@@ -95,7 +62,7 @@ export function MonthlyExpensesPage() {
     }
 
     return filtered;
-  }, [processedTransactions, dateRange]);
+  }, [transactions, dateRange]);
 
   // Get unique category names for legend (sorted by total amount across all months)
   const {
