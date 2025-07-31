@@ -23,6 +23,7 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  EyeInvisibleOutlined,
   EyeOutlined,
   ReloadOutlined,
   SearchOutlined,
@@ -38,6 +39,7 @@ import {
   Select,
   Space,
   Statistic,
+  Switch,
   Table,
   Tooltip,
   Typography,
@@ -78,6 +80,12 @@ export function TransactionsPage() {
 
   const { handleViewDetails, TransactionDetailsModal } =
     useTransactionDetailsModal({ categories });
+
+  const [showExtraStats, setShowExtraStats] = useState(false);
+
+  const onChangeShowExtraStats = (checked: boolean) => {
+    setShowExtraStats(checked);
+  };
 
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
@@ -390,86 +398,98 @@ export function TransactionsPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: '24px' }}>
-        <Title level={2}>Transaction History</Title>
-        <Paragraph style={{ color: '#666' }}>
-          View and manage your stored transactions from localStorage
-        </Paragraph>
-      </div>
-
-      <div style={{ marginBottom: '24px' }}>
-        <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={loadTransactions}
-            loading={isLoadingTransactions}
-          >
-            Refresh
-          </Button>
-        </Space>
-      </div>
-
-      {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} md={4}>
-          <Card>
-            <Statistic
-              title="Total Transactions"
-              value={processedTransactions.length}
-              prefix={<SearchOutlined />}
-            />
-          </Card>
+        <Col xs={24} sm={7} md={7}>
+          <Title level={2}>Transaction History</Title>
+          <Paragraph style={{ color: '#666' }}>
+            View and manage your stored transactions from localStorage
+          </Paragraph>
         </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Card>
-            <Statistic
-              title="Net expense"
-              value={totalAmount}
-              precision={2}
-              prefix="$"
-              valueStyle={{ color: '#cf1322' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Card>
-            <Statistic
-              title="To be categorized"
-              value={
-                processedTransactions.filter((t) => !t.resolvedCategoryKey)
-                  .length
-              }
-              precision={0}
-              prefix=""
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Card>
-            <Statistic
-              title="Claimable transactions"
-              value={
-                processedTransactions.filter((t) => t.claimable === true).length
-              }
-              precision={0}
-              prefix={<CheckCircleOutlined />}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Card>
-            <Statistic
-              title="Without accounting period"
-              value={
-                processedTransactions.filter((t) => !t.accountingDate).length
-              }
-              precision={0}
-              prefix={<CalendarOutlined />}
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
+        <Col xs={24} sm={17} md={17}>
+          {/* Statistics Cards */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={8}>
+              <Card>
+                <Statistic
+                  title="Total Transactions"
+                  value={processedTransactions.length}
+                  prefix={<SearchOutlined />}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card>
+                <Statistic
+                  title="Net expense"
+                  value={totalAmount}
+                  precision={2}
+                  prefix="$"
+                  valueStyle={{ color: '#cf1322' }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card>
+                <Statistic
+                  title="To be categorized"
+                  value={
+                    processedTransactions.filter((t) => !t.resolvedCategoryKey)
+                      .length
+                  }
+                  precision={0}
+                  prefix=""
+                  valueStyle={{ color: '#1890ff' }}
+                />
+              </Card>
+            </Col>
+            {showExtraStats && (
+              <Col xs={24} sm={12} md={8}>
+                <Card>
+                  <Statistic
+                    title="Claimable transactions"
+                    value={
+                      processedTransactions.filter((t) => t.claimable === true)
+                        .length
+                    }
+                    precision={0}
+                    prefix={<CheckCircleOutlined />}
+                    valueStyle={{ color: '#52c41a' }}
+                  />
+                </Card>
+              </Col>
+            )}
+            {showExtraStats && (
+              <Col xs={24} sm={12} md={8}>
+                <Card>
+                  <Statistic
+                    title="Overrided accounting dates"
+                    value={
+                      processedTransactions.filter((t) => !!t.accountingDate)
+                        .length
+                    }
+                    precision={0}
+                    prefix={<CalendarOutlined />}
+                    valueStyle={{ color: '#1890ff' }}
+                  />
+                </Card>
+              </Col>
+            )}
+            {showExtraStats && (
+              <Col xs={24} sm={12} md={8}>
+                <Card>
+                  <Statistic
+                    title="Ignored transactions"
+                    value={
+                      resolvedTransactions.length - processedTransactions.length
+                    }
+                    precision={0}
+                    prefix={<EyeInvisibleOutlined />}
+                    valueStyle={{ color: '#666' }}
+                  />
+                </Card>
+              </Col>
+            )}
+          </Row>
         </Col>
       </Row>
 
@@ -583,6 +603,18 @@ export function TransactionsPage() {
                 ]}
               />
             </div>
+            <div>&nbsp;</div>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={loadTransactions}
+              loading={isLoadingTransactions}
+            >
+              Refresh
+            </Button>
+            <Switch
+              checked={showExtraStats}
+              onChange={onChangeShowExtraStats}
+            />
           </div>
         </div>
 
