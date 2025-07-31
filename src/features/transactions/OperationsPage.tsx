@@ -156,6 +156,33 @@ export function OperationsPage() {
     );
   };
 
+  const handleExportManualTransactions = () => {
+    const manualTransactions = parsedTransactions.filter(
+      (t) => t.isManual === true
+    );
+
+    if (manualTransactions.length === 0) {
+      message.warning('No manual transactions found to export!');
+      return;
+    }
+
+    const dataStr = JSON.stringify(manualTransactions, null, 2);
+    const dataUri =
+      'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+    const timestamp = format(new Date(), 'yyyy-MM-dd-HHmmss');
+    const exportFileDefaultName = `manual-transactions-${timestamp}.json`;
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+
+    message.success(
+      `Exported ${manualTransactions.length} manual transactions successfully!`
+    );
+  };
+
   return (
     <div>
       <div style={{ marginBottom: '24px' }}>
@@ -204,6 +231,18 @@ export function OperationsPage() {
               value={parsedTransactions.filter((t) => t.accountingDate).length}
               prefix={<CalendarOutlined />}
               valueStyle={{ color: '#fa8c16' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Statistic
+              title="Manual Transactions"
+              value={
+                parsedTransactions.filter((t) => t.isManual === true).length
+              }
+              prefix={<SaveOutlined />}
+              valueStyle={{ color: '#722ed1' }}
             />
           </Card>
         </Col>
@@ -295,6 +334,25 @@ export function OperationsPage() {
               Clear Auto-assigned Categories
             </Button>
           </Popconfirm>
+        </Space>
+      </Card>
+
+      {/* Manual Transaction Operations */}
+      <Card
+        title="Manual Transaction Operations"
+        style={{ marginBottom: '24px' }}
+      >
+        <Space wrap>
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={handleExportManualTransactions}
+            disabled={
+              parsedTransactions.filter((t) => t.isManual === true).length === 0
+            }
+            size="large"
+          >
+            Export Manual Transactions
+          </Button>
         </Space>
       </Card>
 
