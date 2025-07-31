@@ -28,6 +28,7 @@ pnpm format:check
 ## Architecture Overview
 
 ### PDF Processing Pipeline
+
 The application follows a multi-stage PDF processing approach:
 
 1. **Upload** (`src/features/upload/upload.tsx`) - File validation and PDF.js initialization
@@ -46,8 +47,9 @@ The application follows a multi-stage PDF processing approach:
 ### Spatial Analysis Logic
 
 The transaction parsing relies on precise coordinate positioning:
+
 - **Day/Month Detection** - Identifies date components by x-coordinate ranges
-- **Amount Recognition** - Right-aligned amounts with parentheses for negatives  
+- **Amount Recognition** - Right-aligned amounts with parentheses for negatives
 - **Description Assembly** - Groups remaining text by y-coordinate proximity
 - **Multi-line Support** - Handles transactions spanning multiple text lines
 
