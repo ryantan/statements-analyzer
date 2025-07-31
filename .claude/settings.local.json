@@ -1,6 +1,13 @@
 {
   "permissions": {
-    "allow": ["Bash(pnpm add:*)", "Bash(pnpm remove:*)", "Bash(pnpm run:*)"],
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm format:*)",
+      "Bash(pnpm lint:*)"
+    ],
     "deny": []
   }
 }
