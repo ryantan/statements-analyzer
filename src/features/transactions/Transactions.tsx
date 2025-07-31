@@ -58,6 +58,8 @@ export function TransactionsPage() {
     setTransactions,
     loadTransactions,
     isLoadingTransactions,
+    updateTransactionItem,
+    resolvedTransactions,
   } = useTransactions();
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
@@ -81,13 +83,11 @@ export function TransactionsPage() {
 
   // Filter transactions when search text or uncategorized filter changes
   const processedTransactions = useMemo(() => {
-    return transactions
+    return resolvedTransactions
       .filter(isNotCCPayments)
       .filter(isNotRebates)
       .map<TransactionDisplayItem>((transaction) => ({
         ...transaction,
-        resolvedCategoryKey:
-          transaction.categoryKey || transaction.autoCategoryKey,
         searchText: [
           transaction.description.join(' '),
           transaction.dateFormatted,
@@ -97,7 +97,7 @@ export function TransactionsPage() {
           .join('|')
           .toUpperCase(),
       }));
-  }, [transactions]);
+  }, [resolvedTransactions]);
 
   // Filter transactions when search text, uncategorized filter, date range, or category changes
   const filteredTransactions = useMemo(() => {
