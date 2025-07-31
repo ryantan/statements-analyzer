@@ -1,6 +1,16 @@
-import { Transaction, TransactionRaw } from '@/features/transactions/types';
+import {
+  Transaction,
+  TransactionRaw,
+  TransactionResolved,
+} from '@/features/transactions/types';
+import {
+  isNotCCPayments,
+  isNotRebates,
+} from '@/features/transactions/utils/isNotCCPayments';
+import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
+import { isResolvedTransaction } from '@/features/transactions/utils/isResolvedTransaction';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { message } from 'antd';
 import { parseJSON } from 'date-fns';
@@ -9,7 +19,19 @@ export const useTransactions = () => {
   const [transactions, _setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // To be used within useTransactions only!
   const setTransactions = (transactions: Transaction[]) => {
+    // Do some checking here to prevent resolved transactions to be used.
+    if (transactions.some(isResolvedTransaction)) {
+      console.error(
+        'You should not be setting resolved transactions to storage.'
+      );
+      message.error(
+        'You should not be setting resolved transactions to storage.'
+      );
+      return;
+    }
+
     _setTransactions(transactions);
     try {
       localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -166,13 +188,44 @@ export const useTransactions = () => {
     loadFromLocalStorage();
   }, []);
 
+  const resolvedTransactions = useMemo<TransactionResolved[]>(() => {
+    return transactions.map<TransactionResolved>((transaction) => {
+      const resolvedCategoryKey =
+        transaction.categoryKey || transaction.autoCategoryKey;
+      let parentCategoryKey = 'unknown';
+      if (resolvedCategoryKey) {
+        parentCategoryKey = resolvedCategoryKey.split('/')[0];
+      }
+      return {
+        ...transaction,
+        resolvedCategoryKey,
+        parentCategoryKey,
+        resolvedDate: transaction.accountingDate || transaction.date,
+        isResolved: true,
+      };
+    });
+  }, [transactions]);
+
+  const filteredTransactions = useMemo<TransactionResolved[]>(() => {
+    return resolvedTransactions
+      .filter(isNotCCPayments)
+      .filter(isNotRebates)
+      .filter(isNotClaimable);
+  }, [transactions]);
+
   return {
-    transactions,
-    setTransactions,
     parseFromString,
     loadFromFile,
     loadFromLocalStorage,
     loading,
     updateItem,
+    setParsedTransactions: setTransactions,
+
+    // Parsed from storage.
+    parsedTransactions: transactions,
+    // Resolved categories, dates, etc.
+    resolvedTransactions,
+    // resolvedTransactions with some ignored items filtered.
+    transactions: filteredTransactions,
   };
 };

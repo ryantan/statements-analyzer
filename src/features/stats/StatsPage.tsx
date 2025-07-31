@@ -6,11 +6,6 @@ import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick
 import { renderBarLabel } from '@/features/stats/components/renderBarLabel';
 import { renderBarTooltip } from '@/features/stats/components/renderBarTooltip';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
-import {
-  isNotCCPayments,
-  isNotRebates,
-} from '@/features/transactions/utils/isNotCCPayments';
-import { isNotClaimable } from '@/features/transactions/utils/isNotClaimable';
 
 import { useMemo, useState } from 'react';
 
@@ -51,7 +46,7 @@ import {
 
 import { DrillDownModal } from './components/DrillDownModal';
 import { useDrillDown } from './hooks/useDrillDown';
-import { CategoryStats, PieData, TransactionForStats } from './types';
+import { CategoryStats, PieData } from './types';
 
 const { Title, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
@@ -79,33 +74,11 @@ export function StatsPage() {
     pageSize: 20,
   });
 
-  // Group by parent categories
-  const processedTransactions = useMemo(() => {
-    return transactions
-      .filter(isNotCCPayments)
-      .filter(isNotRebates)
-      .filter(isNotClaimable)
-      .map<TransactionForStats>((item) => {
-        const categoryKey = item.categoryKey || item.autoCategoryKey;
-
-        let parentCategoryKey = 'unknown';
-        if (categoryKey) {
-          parentCategoryKey = categoryKey.split('/')[0];
-        }
-
-        return {
-          ...item,
-          parentCategoryKey: parentCategoryKey,
-          resolvedDate: item.accountingDate || item.date,
-        };
-      });
-  }, [transactions]);
-
   // Extract available year-month options from data
   const availableYearMonths = useMemo(() => {
     const yearMonthSet = new Set<string>();
 
-    processedTransactions.forEach((transaction) => {
+    transactions.forEach((transaction) => {
       const yearMonth = format(transaction.resolvedDate, 'yyyy-MM');
       yearMonthSet.add(yearMonth);
     });
@@ -117,7 +90,7 @@ export function StatsPage() {
         value: yearMonth,
         label: format(parseISO(`${yearMonth}-01`), 'MMMM yyyy'),
       }));
-  }, [processedTransactions]);
+  }, [transactions]);
 
   // Handle year-month selection
   const handleYearMonthChange = (value: string | null) => {
@@ -144,7 +117,7 @@ export function StatsPage() {
 
   // Filter transactions by selected date range
   const filteredTransactions = useMemo(() => {
-    let filtered = [...processedTransactions];
+    let filtered = [...transactions];
 
     // Apply date range filter
     if (dateRange && dateRange[0] && dateRange[1]) {
@@ -160,7 +133,7 @@ export function StatsPage() {
     }
 
     return filtered;
-  }, [processedTransactions, dateRange]);
+  }, [transactions, dateRange]);
 
   // Calculate category statistics
   // This is for the table.

@@ -33,7 +33,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 const { Title } = Typography;
 
 export function UploadPage() {
-  const { loadFromLocalStorage, setTransactions: saveTransactions } =
+  const { loadFromLocalStorage, setParsedTransactions: saveTransactions } =
     useTransactions();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);

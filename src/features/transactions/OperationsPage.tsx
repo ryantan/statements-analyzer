@@ -23,39 +23,40 @@ import {
   Typography,
   message,
 } from 'antd';
+import { format } from 'date-fns';
 
 const { Title, Paragraph } = Typography;
 
 export function OperationsPage() {
   const {
-    transactions,
-    setTransactions,
+    parsedTransactions,
+    setParsedTransactions,
     loadTransactions,
     isLoadingTransactions,
     loadFromFile,
   } = useTransactions();
 
   const handleClearCategories = () => {
-    const newTransactions = transactions.map((transaction) => ({
+    const newTransactions = parsedTransactions.map((transaction) => ({
       ...transaction,
       autoCategoryKey: undefined,
     }));
-    setTransactions(newTransactions);
+    setParsedTransactions(newTransactions);
     message.success('Auto-assigned categories removed from all transactions.');
   };
 
   const handleAssignCategories = () => {
-    const newTransactions = assignCommonCategories(transactions);
-    setTransactions(newTransactions);
+    const newTransactions = assignCommonCategories(parsedTransactions);
+    setParsedTransactions(newTransactions);
   };
 
   const handleDownloadJSON = () => {
-    if (transactions.length === 0) {
+    if (parsedTransactions.length === 0) {
       message.error('No transactions to download!');
       return;
     }
 
-    const dataStr = JSON.stringify(transactions, null, 2);
+    const dataStr = JSON.stringify(parsedTransactions, null, 2);
     const dataUri =
       'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
 
@@ -128,37 +129,30 @@ export function OperationsPage() {
   };
 
   const handleOverwriteLocalStorage = () => {
-    setTransactions(transactions);
+    setParsedTransactions(parsedTransactions);
   };
 
   const handleSetDecemberTo2024 = () => {
-    const newTransactions = transactions.map((transaction) => {
-      const transactionDate = new Date(transaction.date);
-      if (transactionDate.getMonth() === 11) {
+    let updatedCount = 0;
+    const newTransactions = parsedTransactions.map((transaction) => {
+      if (transaction.date.getMonth() === 11) {
         // December is month 11 (0-indexed)
-        const newDate = new Date(transactionDate);
+        const newDate = new Date(transaction.date);
         newDate.setFullYear(2024);
+        updatedCount++;
         return {
           ...transaction,
           date: newDate,
-          dateFormatted: newDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          }),
+          // "1 Jan"
+          dateFormatted: format(newDate, 'd MMM'),
         };
       }
       return transaction;
     });
 
-    const decemberTransactions = newTransactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.date);
-      return transactionDate.getMonth() === 11;
-    });
-
-    setTransactions(newTransactions);
+    setParsedTransactions(newTransactions);
     message.success(
-      `Updated ${decemberTransactions.length} December transactions to year 2024.`
+      `Updated ${updatedCount} December transactions to year 2024.`
     );
   };
 
@@ -178,7 +172,7 @@ export function OperationsPage() {
           <Card>
             <Statistic
               title="Total Transactions"
-              value={transactions.length}
+              value={parsedTransactions.length}
               prefix={<ReloadOutlined />}
             />
           </Card>
@@ -187,7 +181,7 @@ export function OperationsPage() {
           <Card>
             <Statistic
               title="Auto-categorized"
-              value={transactions.filter((t) => t.autoCategoryKey).length}
+              value={parsedTransactions.filter((t) => t.autoCategoryKey).length}
               prefix={<TagOutlined />}
               valueStyle={{ color: '#52c41a' }}
             />
@@ -197,7 +191,7 @@ export function OperationsPage() {
           <Card>
             <Statistic
               title="Manual Categories"
-              value={transactions.filter((t) => t.categoryKey).length}
+              value={parsedTransactions.filter((t) => t.categoryKey).length}
               prefix={<TagOutlined />}
               valueStyle={{ color: '#1890ff' }}
             />
@@ -207,7 +201,7 @@ export function OperationsPage() {
           <Card>
             <Statistic
               title="With Accounting Date"
-              value={transactions.filter((t) => t.accountingDate).length}
+              value={parsedTransactions.filter((t) => t.accountingDate).length}
               prefix={<CalendarOutlined />}
               valueStyle={{ color: '#fa8c16' }}
             />
@@ -229,7 +223,7 @@ export function OperationsPage() {
           <Button
             icon={<DownloadOutlined />}
             onClick={handleDownloadJSON}
-            disabled={transactions.length === 0}
+            disabled={parsedTransactions.length === 0}
             size="large"
           >
             Export JSON
@@ -286,7 +280,6 @@ export function OperationsPage() {
           <Button
             icon={<TagOutlined />}
             onClick={handleAssignCategories}
-            disabled={transactions.length === 0}
             size="large"
           >
             Auto-assign Categories
@@ -297,14 +290,8 @@ export function OperationsPage() {
             onConfirm={handleClearCategories}
             okText="Yes"
             cancelText="No"
-            disabled={transactions.length === 0}
           >
-            <Button
-              icon={<DeleteOutlined />}
-              danger
-              disabled={transactions.length === 0}
-              size="large"
-            >
+            <Button icon={<DeleteOutlined />} danger size="large">
               Clear Auto-assigned Categories
             </Button>
           </Popconfirm>
@@ -320,13 +307,8 @@ export function OperationsPage() {
             onConfirm={handleSetDecemberTo2024}
             okText="Yes"
             cancelText="No"
-            disabled={transactions.length === 0}
           >
-            <Button
-              icon={<CalendarOutlined />}
-              disabled={transactions.length === 0}
-              size="large"
-            >
+            <Button icon={<CalendarOutlined />} size="large">
               Set December 2024
             </Button>
           </Popconfirm>
