@@ -83,3 +83,7 @@ src/
 - Date parsing assumes current year for day/month combinations
 - No test suite or CI/CD pipeline currently configured
 - Dynamic imports used for client-side-only PDF processing components
+- Always use atomic commits with conventional commits
+- Try to keep code files within 300 lines. We do that by implementing logic and components in separate files
+- Always document functions and methods
+- Try to guess what is the user trying to do based on the prompt, and clarify if you got the intention right.
