@@ -28,7 +28,13 @@ export type TransactionRaw = Omit<Transaction, 'date' | 'accountingDate'> & {
   accountingDate?: string;
 };
 
-export type TransactionDisplayItem = Transaction & {
-  searchText: string;
+export type TransactionResolved = Transaction & {
   resolvedCategoryKey: string | undefined;
+  parentCategoryKey: string;
+  resolvedDate: Date;
+  isResolved: boolean;
+};
+
+export type TransactionDisplayItem = TransactionResolved & {
+  searchText: string;
 };

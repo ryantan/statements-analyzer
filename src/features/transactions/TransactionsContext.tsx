@@ -1,13 +1,14 @@
 'use client';
 
-import { Transaction } from '@/features/transactions/types';
+import {
+  Transaction,
+  TransactionResolved,
+} from '@/features/transactions/types';
 import { useTransactions as useTransactionsHook } from '@/features/transactions/useTransactions';
 
 import { ReactNode, createContext, useContext } from 'react';
 
 interface TransactionsContextType {
-  transactions: Transaction[];
-  setTransactions: (transactions: Transaction[]) => void;
   loadTransactions: () => void;
   loadFromFile: (fileContent: string, append: boolean) => void;
   isLoadingTransactions: boolean;
@@ -15,6 +16,14 @@ interface TransactionsContextType {
     key: string,
     updater: (item: Transaction) => Transaction
   ) => void;
+  setParsedTransactions: (transactions: Transaction[]) => void;
+
+  // Closest to storage, with only dates parsed.
+  parsedTransactions: Transaction[];
+  // With category, parent category and dates resolved.
+  resolvedTransactions: TransactionResolved[];
+  // resolvedTransactions, with some ignored items filtered.
+  transactions: TransactionResolved[];
 }
 
 const TransactionsContext = createContext<TransactionsContextType | undefined>(
@@ -27,21 +36,27 @@ interface TransactionsProviderProps {
 
 export function TransactionsProvider({ children }: TransactionsProviderProps) {
   const {
-    transactions,
-    setTransactions,
     loadFromLocalStorage: loadTransactions,
     loadFromFile,
     loading: isLoadingTransactions,
     updateItem: updateTransactionItem,
+    setParsedTransactions,
+
+    parsedTransactions,
+    resolvedTransactions,
+    transactions,
   } = useTransactionsHook();
 
   const value: TransactionsContextType = {
-    transactions,
-    setTransactions,
     loadTransactions,
     loadFromFile,
     isLoadingTransactions,
     updateTransactionItem,
+    setParsedTransactions,
+
+    parsedTransactions,
+    resolvedTransactions,
+    transactions,
   };
 
   return (
