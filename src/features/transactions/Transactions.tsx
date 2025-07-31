@@ -93,12 +93,6 @@ export function TransactionsPage() {
           transaction.dateFormatted,
           transaction.amount,
           transaction.remarks || '',
-          transaction.accountingDate
-            ? new Date(transaction.accountingDate).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-              })
-            : '',
         ]
           .join('|')
           .toUpperCase(),
