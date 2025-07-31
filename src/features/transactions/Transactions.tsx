@@ -54,8 +54,6 @@ const { RangePicker } = DatePicker;
 export function TransactionsPage() {
   const { categories } = useCategories();
   const {
-    transactions,
-    setTransactions,
     loadTransactions,
     isLoadingTransactions,
     updateTransactionItem,
@@ -171,60 +169,51 @@ export function TransactionsPage() {
     transactionKey: string,
     categoryKey: string | undefined
   ) => {
-    const updatedTransactions = transactions.map((transaction) =>
-      transaction.key === transactionKey
-        ? { ...transaction, categoryKey }
-        : transaction
-    );
-    setTransactions(updatedTransactions);
+    updateTransactionItem(transactionKey, (transaction) => ({
+      ...transaction,
+      categoryKey,
+    }));
   };
 
   const handleRemarksChange = (
     transactionKey: string,
     remarks: string | undefined
   ) => {
-    const updatedTransactions = transactions.map((transaction) =>
-      transaction.key === transactionKey
-        ? { ...transaction, remarks }
-        : transaction
-    );
-    setTransactions(updatedTransactions);
+    updateTransactionItem(transactionKey, (transaction) => ({
+      ...transaction,
+      remarks,
+    }));
   };
 
   const handleClaimableChange = (
     transactionKey: string,
     claimable: boolean
   ) => {
-    const updatedTransactions = transactions.map((transaction) =>
-      transaction.key === transactionKey
-        ? { ...transaction, claimable }
-        : transaction
-    );
-    setTransactions(updatedTransactions);
+    updateTransactionItem(transactionKey, (transaction) => ({
+      ...transaction,
+      claimable,
+    }));
   };
 
   const handleAccountingDateChange = (
     transactionKey: string,
     accountingDate: Date | undefined
   ) => {
-    const updatedTransactions = transactions.map((transaction) =>
-      transaction.key === transactionKey
-        ? {
-            ...transaction,
-            accountingDate,
-            accountingYear: accountingDate
-              ? accountingDate.getFullYear()
-              : undefined,
-            accountingMonth: accountingDate
-              ? accountingDate.getMonth() + 1
-              : undefined,
-            accountingDay: accountingDate
-              ? accountingDate.getDate()
-              : undefined,
-          }
-        : transaction
-    );
-    setTransactions(updatedTransactions);
+    if (accountingDate) {
+      updateTransactionItem(transactionKey, (transaction) => ({
+        ...transaction,
+        accountingDate,
+        accountingYear: accountingDate.getFullYear(),
+        accountingMonth: accountingDate.getMonth() + 1,
+        accountingDay: accountingDate.getDate(),
+      }));
+    } else {
+      updateTransactionItem(transactionKey, (transaction) => ({
+        ...transaction,
+        accountingDate: undefined,
+      }));
+      return;
+    }
   };
 
   const handleSearch = (value: string) => {
