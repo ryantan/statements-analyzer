@@ -21,6 +21,8 @@ export type Transaction = {
   bank?: string;
   bankAccount?: string;
   fileName?: string;
+  // Manual transaction indicator
+  isManual?: boolean;
 };
 
 export type TransactionRaw = Omit<Transaction, 'date' | 'accountingDate'> & {
