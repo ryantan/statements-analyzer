@@ -16,6 +16,7 @@ interface TransactionsContextType {
     key: string,
     updater: (item: Transaction) => Transaction
   ) => void;
+  addTransaction: (transaction: Transaction) => void;
   setParsedTransactions: (transactions: Transaction[]) => void;
 
   // Closest to storage, with only dates parsed.
@@ -40,6 +41,7 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     loadFromFile,
     loading: isLoadingTransactions,
     updateItem: updateTransactionItem,
+    addTransaction,
     setParsedTransactions,
 
     parsedTransactions,
@@ -52,6 +54,7 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     loadFromFile,
     isLoadingTransactions,
     updateTransactionItem,
+    addTransaction,
     setParsedTransactions,
 
     parsedTransactions,

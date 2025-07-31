@@ -184,6 +184,11 @@ export const useTransactions = () => {
     setTransactions(newTransactions);
   };
 
+  const addTransaction = (transaction: Transaction) => {
+    const newTransactions = [...transactions, transaction];
+    setTransactions(newTransactions);
+  };
+
   useEffect(() => {
     loadFromLocalStorage();
   }, []);
@@ -219,6 +224,7 @@ export const useTransactions = () => {
     loadFromLocalStorage,
     loading,
     updateItem,
+    addTransaction,
     setParsedTransactions: setTransactions,
 
     // Parsed from storage.
