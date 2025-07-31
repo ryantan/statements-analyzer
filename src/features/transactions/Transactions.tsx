@@ -5,6 +5,7 @@ import { useCategories } from '@/features/categories/useCategories';
 import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
 import { CategoryCell } from '@/features/transactions/components/CategoryCell';
+import { ManualTransactionForm } from '@/features/transactions/components/ManualTransactionForm';
 import { RemarksCell } from '@/features/transactions/components/RemarksCell';
 import { TransactionDisplayItem } from '@/features/transactions/types';
 import {
@@ -23,8 +24,10 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  EditOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
+  PlusOutlined,
   ReloadOutlined,
   SearchOutlined,
   TagOutlined,
@@ -37,7 +40,6 @@ import {
   Input,
   Row,
   Select,
-  Space,
   Statistic,
   Switch,
   Table,
@@ -59,6 +61,7 @@ export function TransactionsPage() {
     loadTransactions,
     isLoadingTransactions,
     updateTransactionItem,
+    addTransaction,
     resolvedTransactions,
   } = useTransactions();
   const [searchText, setSearchText] = useState('');
@@ -70,6 +73,7 @@ export function TransactionsPage() {
     useState<string>('not-claimable');
   const [accountingPeriodFilter, setAccountingPeriodFilter] =
     useState<string>('');
+  const [manualFilter, setManualFilter] = useState<string>('');
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
@@ -82,6 +86,8 @@ export function TransactionsPage() {
     useTransactionDetailsModal({ categories });
 
   const [showExtraStats, setShowExtraStats] = useState(false);
+  const [showManualTransactionForm, setShowManualTransactionForm] =
+    useState(false);
 
   const onChangeShowExtraStats = (checked: boolean) => {
     setShowExtraStats(checked);
@@ -163,6 +169,17 @@ export function TransactionsPage() {
       }
     }
 
+    // Apply manual filter
+    if (manualFilter && manualFilter !== '') {
+      if (manualFilter === 'manual') {
+        filtered = filtered.filter(
+          (transaction) => transaction.isManual === true
+        );
+      } else if (manualFilter === 'imported') {
+        filtered = filtered.filter((transaction) => !transaction.isManual);
+      }
+    }
+
     return filtered;
   }, [
     processedTransactions,
@@ -171,6 +188,7 @@ export function TransactionsPage() {
     selectedCategory,
     claimableFilter,
     accountingPeriodFilter,
+    manualFilter,
   ]);
 
   const handleCategoryChange = (
@@ -238,6 +256,19 @@ export function TransactionsPage() {
       sortDirections: ['descend', 'ascend'],
       sorter: (a: TransactionDisplayItem, b: TransactionDisplayItem) =>
         a.date.getTime() - b.date.getTime(),
+    },
+    {
+      title: '',
+      dataIndex: 'isManual',
+      key: 'isManual',
+      width: 40,
+      align: 'center' as const,
+      render: (isManual: boolean | undefined) =>
+        isManual ? (
+          <Tooltip title="Manually added transaction">
+            <EditOutlined style={{ color: '#722ed1' }} />
+          </Tooltip>
+        ) : null,
     },
     {
       title: 'Accounting Period',
@@ -603,7 +634,30 @@ export function TransactionsPage() {
                 ]}
               />
             </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <EditOutlined />
+              <span>Source:</span>
+              <Select
+                placeholder="Filter by source"
+                value={manualFilter}
+                onChange={setManualFilter}
+                style={{ width: '100%', maxWidth: 150, minWidth: 120 }}
+                allowClear
+                options={[
+                  { value: '', label: 'All' },
+                  { value: 'manual', label: 'Manual' },
+                  { value: 'imported', label: 'Imported' },
+                ]}
+              />
+            </div>
             <div>&nbsp;</div>
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => setShowManualTransactionForm(true)}
+              type="primary"
+            >
+              Add Transaction
+            </Button>
             <Button
               icon={<ReloadOutlined />}
               onClick={loadTransactions}
@@ -659,6 +713,11 @@ export function TransactionsPage() {
       </Card>
 
       <TransactionDetailsModal />
+      <ManualTransactionForm
+        visible={showManualTransactionForm}
+        onCancel={() => setShowManualTransactionForm(false)}
+        onAdd={addTransaction}
+      />
     </div>
   );
 }
