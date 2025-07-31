@@ -6,8 +6,11 @@
       "Bash(pnpm run:*)",
       "Bash(pnpm dev:*)",
       "Bash(pnpm format:*)",
-      "Bash(pnpm lint:*)"
+      "Bash(pnpm lint:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
+    "includeCoAuthoredBy": false,
     "deny": []
   }
 }
