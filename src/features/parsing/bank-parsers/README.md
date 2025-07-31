@@ -49,7 +49,7 @@ export class DBSParser extends BaseBankParser {
 You need to analyze your bank's PDF to find the correct coordinates:
 
 1. **Day Items**: Find x-coordinates where day numbers appear
-2. **Month Items**: Find x-coordinates where month names appear  
+2. **Month Items**: Find x-coordinates where month names appear
 3. **Amount Items**: Find x-coordinates where amounts appear
 
 Use browser dev tools or PDF analysis tools to determine these coordinates.
@@ -60,17 +60,16 @@ Update the filter conditions in your parser:
 
 ```typescript
 // Day items
-const dayItems = items
-  .filter((item) => this.isBetween(item.left, 40, 50)) // Adjust for your bank
+const dayItems = items.filter((item) => this.isBetween(item.left, 40, 50)); // Adjust for your bank
 
-// Month items  
-const monthItem = candidateWords.find((item) =>
-  this.isBetween(item.left, 50, 65) // Adjust for your bank
+// Month items
+const monthItem = candidateWords.find(
+  (item) => this.isBetween(item.left, 50, 65) // Adjust for your bank
 );
 
 // Amount items
-const amountItem = candidateWords.find((item) =>
-  this.isBetween(item.right, 550, 580) // Adjust for your bank
+const amountItem = candidateWords.find(
+  (item) => this.isBetween(item.right, 550, 580) // Adjust for your bank
 );
 ```
 
@@ -117,7 +116,9 @@ Each parser logs its activity to help with debugging:
 
 ```typescript
 console.log('Citibank dayItems:', dayItems);
-console.log(`Using parser for bank: ${parser.bankName} (version: ${parser.version})`);
+console.log(
+  `Using parser for bank: ${parser.bankName} (version: ${parser.version})`
+);
 ```
 
 ## Future Enhancements
@@ -126,4 +127,4 @@ console.log(`Using parser for bank: ${parser.bankName} (version: ${parser.versio
 2. **Parser Versioning**: Handle format changes within the same bank
 3. **Validation**: Add validation for extracted transactions
 4. **Performance**: Optimize parsing for large PDFs
-5. **Error Handling**: Better error handling for malformed PDFs 
+5. **Error Handling**: Better error handling for malformed PDFs
