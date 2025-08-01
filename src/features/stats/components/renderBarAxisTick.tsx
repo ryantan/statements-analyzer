@@ -42,7 +42,7 @@ export const renderBarAxisTick: YAxisProps['tick'] = (props: {
  * @returns A text element or a group of text elements representing
  *   the rendered tick label, with longer labels wrapped into multiple lines.
  */
-const renderBarAxisTickWrapped: YAxisProps['tick'] = (props: {
+export const renderBarAxisTickWrapped: YAxisProps['tick'] = (props: {
   x: number;
   y: number;
   payload: { value: string | number | null };

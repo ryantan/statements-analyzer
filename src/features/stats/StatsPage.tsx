@@ -176,7 +176,7 @@ export function StatsPage() {
     });
 
     return stats.sort((a, b) => Math.abs(b.total) - Math.abs(a.total));
-  }, [filteredTransactions, categories]);
+  }, [filteredTransactions, categoryMap]);
 
   // This is for the charts.
   const pieData = useMemo((): PieData[] => {
@@ -205,7 +205,7 @@ export function StatsPage() {
         key,
       }))
       .sort((a, b) => b.value - a.value);
-  }, [filteredTransactions, categories]);
+  }, [filteredTransactions, categories, categoryMap]);
 
   const totalExpense = filteredTransactions
     .reduce((sum, t) => sum + t.amount, 0)
