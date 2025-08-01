@@ -27,7 +27,14 @@ export const useAvailableHeight = ({
       windowHeight - containerTop - tableHeaderHeight - additionalOffset;
     // Ensure there's a minimum height.
     return Math.max(available, minHeight);
-  }, [containerBounds]);
+  }, [
+    additionalOffset,
+    containerBounds.height,
+    containerBounds.top,
+    defaultInitialHeight,
+    minHeight,
+    tableHeaderHeight,
+  ]);
 
   return { availableHeight, containerRef };
 };
