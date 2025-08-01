@@ -1,7 +1,7 @@
 'use client';
 
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
-import { useStore } from '@/store/TransactionsContext';
+import { useStore } from '@/store/Store';
 
 import { ChangeEvent } from 'react';
 

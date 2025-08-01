@@ -5,7 +5,7 @@ import { useCategories } from '@/features/categories/useCategories';
 import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick';
 import { renderBarLabel } from '@/features/stats/components/renderBarLabel';
 import { renderBarTooltip } from '@/features/stats/components/renderBarTooltip';
-import { useStore } from '@/store/TransactionsContext';
+import { useStore } from '@/store/Store';
 
 import { useMemo, useState } from 'react';
 

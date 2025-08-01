@@ -15,7 +15,7 @@ import {
   isClaimable,
   isNotClaimable,
 } from '@/features/transactions/utils/isNotClaimable';
-import { useStore } from '@/store/TransactionsContext';
+import { useStore } from '@/store/Store';
 import { useAvailableHeight } from '@/utils/hooks/useAvailableHeight';
 
 import { useMemo, useState } from 'react';

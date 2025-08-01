@@ -4,7 +4,7 @@ import { DatePicker } from '@/components';
 import { useCategories } from '@/features/categories/useCategories';
 import { renderStackBarTooltip } from '@/features/monthly/components/renderStackBarTooltip';
 import { useCategoryFilter } from '@/features/monthly/hooks/useCategoryFilter';
-import { useStore } from '@/store/TransactionsContext';
+import { useStore } from '@/store/Store';
 
 import { useMemo, useState } from 'react';
 

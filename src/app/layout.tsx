@@ -1,5 +1,5 @@
 import { Navigation } from '@/components/Navigation';
-import { StoreProvider } from '@/store/TransactionsContext';
+import { StoreProvider } from '@/store/Store';
 
 import { ReactNode } from 'react';
 

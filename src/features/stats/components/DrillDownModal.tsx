@@ -2,7 +2,7 @@
 
 import { Category } from '@/features/categories/types';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
-import { useStore } from '@/store/TransactionsContext';
+import { useStore } from '@/store/Store';
 
 import { useMemo, useState } from 'react';
 
