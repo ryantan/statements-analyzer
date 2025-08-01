@@ -5,7 +5,7 @@ import { useCategories } from '@/features/categories/useCategories';
 import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick';
 import { renderBarLabel } from '@/features/stats/components/renderBarLabel';
 import { renderBarTooltip } from '@/features/stats/components/renderBarTooltip';
-import { useTransactions } from '@/features/transactions/TransactionsContext';
+import { useStore } from '@/store/TransactionsContext';
 
 import { useMemo, useState } from 'react';
 
@@ -54,7 +54,7 @@ const { Option } = Select;
 
 export function StatsPage() {
   const { categories, categoryMap } = useCategories();
-  const { transactions } = useTransactions();
+  const { transactions } = useStore();
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
   );

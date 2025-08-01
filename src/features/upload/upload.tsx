@@ -1,8 +1,8 @@
 'use client';
 
 import { bankParserFactory } from '@/features/parsing/bank-parsers';
+import { useTransactions } from '@/features/transactions/hooks/useTransactions';
 import { Transaction } from '@/features/transactions/types';
-import { useTransactions } from '@/features/transactions/useTransactions';
 import { extractTransactionsFromPdf } from '@/features/upload/extractTransactionsFromPdf';
 
 import { useState } from 'react';

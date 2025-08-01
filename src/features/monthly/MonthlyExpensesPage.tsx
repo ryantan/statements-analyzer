@@ -4,7 +4,7 @@ import { DatePicker } from '@/components';
 import { useCategories } from '@/features/categories/useCategories';
 import { renderStackBarTooltip } from '@/features/monthly/components/renderStackBarTooltip';
 import { useCategoryFilter } from '@/features/monthly/hooks/useCategoryFilter';
-import { useTransactions } from '@/features/transactions/TransactionsContext';
+import { useStore } from '@/store/TransactionsContext';
 
 import { useMemo, useState } from 'react';
 
@@ -40,7 +40,7 @@ interface MonthlyData {
 
 export function MonthlyExpensesPage() {
   const { categories, categoryMap } = useCategories();
-  const { transactions } = useTransactions();
+  const { transactions } = useStore();
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
   );

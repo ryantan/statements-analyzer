@@ -2,7 +2,6 @@
 
 import { DatePicker } from '@/components';
 import { useCategories } from '@/features/categories/useCategories';
-import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
 import { CategoryCell } from '@/features/transactions/components/CategoryCell';
 import { ManualTransactionForm } from '@/features/transactions/components/ManualTransactionForm';
@@ -16,6 +15,7 @@ import {
   isClaimable,
   isNotClaimable,
 } from '@/features/transactions/utils/isNotClaimable';
+import { useStore } from '@/store/TransactionsContext';
 import { useAvailableHeight } from '@/utils/hooks/useAvailableHeight';
 
 import { useMemo, useState } from 'react';
@@ -63,7 +63,7 @@ export function TransactionsPage() {
     updateTransactionItem,
     addTransaction,
     resolvedTransactions,
-  } = useTransactions();
+  } = useStore();
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null

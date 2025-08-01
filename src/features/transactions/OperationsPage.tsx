@@ -1,7 +1,7 @@
 'use client';
 
-import { useTransactions } from '@/features/transactions/TransactionsContext';
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
+import { useStore } from '@/store/TransactionsContext';
 
 import {
   CalendarOutlined,
@@ -34,7 +34,7 @@ export function OperationsPage() {
     loadTransactions,
     isLoadingTransactions,
     loadFromFile,
-  } = useTransactions();
+  } = useStore();
 
   const handleClearCategories = () => {
     const newTransactions = parsedTransactions.map((transaction) => ({

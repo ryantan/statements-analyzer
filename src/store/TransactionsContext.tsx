@@ -1,14 +1,14 @@
 'use client';
 
+import { useTransactions as useTransactionsHook } from '@/features/transactions/hooks/useTransactions';
 import {
   Transaction,
   TransactionResolved,
 } from '@/features/transactions/types';
-import { useTransactions as useTransactionsHook } from '@/features/transactions/useTransactions';
 
 import { ReactNode, createContext, useContext } from 'react';
 
-interface TransactionsContextType {
+interface StoreContextType {
   loadTransactions: () => void;
   loadFromFile: (fileContent: string, append: boolean) => void;
   isLoadingTransactions: boolean;
@@ -27,15 +27,13 @@ interface TransactionsContextType {
   transactions: TransactionResolved[];
 }
 
-const TransactionsContext = createContext<TransactionsContextType | undefined>(
-  undefined
-);
+const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-interface TransactionsProviderProps {
+interface StoreProviderProps {
   children: ReactNode;
 }
 
-export function TransactionsProvider({ children }: TransactionsProviderProps) {
+export function StoreProvider({ children }: StoreProviderProps) {
   const {
     loadFromLocalStorage: loadTransactions,
     loadFromFile,
@@ -49,7 +47,7 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     transactions,
   } = useTransactionsHook();
 
-  const value: TransactionsContextType = {
+  const value: StoreContextType = {
     loadTransactions,
     loadFromFile,
     isLoadingTransactions,
@@ -63,18 +61,14 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
   };
 
   return (
-    <TransactionsContext.Provider value={value}>
-      {children}
-    </TransactionsContext.Provider>
+    <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
   );
 }
 
-export function useTransactions() {
-  const context = useContext(TransactionsContext);
+export function useStore() {
+  const context = useContext(StoreContext);
   if (context === undefined) {
-    throw new Error(
-      'useTransactions must be used within a TransactionsProvider'
-    );
+    throw new Error('useStore must be used within a StoreProvider');
   }
   return context;
 }
