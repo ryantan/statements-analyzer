@@ -11,7 +11,7 @@ export const assignCommonCategories = (items: Transaction[]): Transaction[] => {
       return { ...item };
     }
 
-    let newCategoryKey: string | undefined = undefined;
+    let newCategoryKey: string | undefined;
     const description = item.description[0].toUpperCase();
     const descriptionAll = item.description.join(' ').toUpperCase();
     if (descriptionAll.includes('BUS/MRT')) {

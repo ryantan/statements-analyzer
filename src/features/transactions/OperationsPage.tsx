@@ -3,6 +3,8 @@
 import { assignCommonCategories } from '@/features/transactions/assignCommonCategories';
 import { useStore } from '@/store/TransactionsContext';
 
+import { ChangeEvent } from 'react';
+
 import {
   CalendarOutlined,
   DeleteOutlined,
@@ -72,7 +74,7 @@ export function OperationsPage() {
     void message.success('Transactions downloaded successfully!');
   };
 
-  const handleImportJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportJSON = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
@@ -101,7 +103,7 @@ export function OperationsPage() {
     event.target.value = '';
   };
 
-  const handleInsertJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInsertJSON = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;

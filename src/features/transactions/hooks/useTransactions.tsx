@@ -220,7 +220,7 @@ export const useTransactions = () => {
       .filter(isNotCCPayments)
       .filter(isNotRebates)
       .filter(isNotClaimable);
-  }, [transactions]);
+  }, [resolvedTransactions]);
 
   return {
     parseFromString,

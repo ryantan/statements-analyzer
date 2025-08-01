@@ -3,8 +3,6 @@
 import { Category } from '@/features/categories/types';
 import { TransactionDisplayItem } from '@/features/transactions/types';
 
-import { useState } from 'react';
-
 import { Dropdown, Tag } from 'antd';
 
 import styles from './CategoryCell.module.scss';
