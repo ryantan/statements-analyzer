@@ -18,7 +18,12 @@ export class OCBCParser extends BaseBankParser {
     page: PDFPageProxy
   ): TransactionItem[] {
     const itemsRaw = this.groupByProximity(textItemsRaw);
-    // console.log('[OCBCParser] Grouped items:', itemsRaw);
+    console.log(
+      '[OCBCParser] Grouped items:',
+      itemsRaw,
+      ', page:',
+      page.pageNumber
+    );
 
     const indexOfFirstTransactionsTable = itemsRaw.findIndex((item) =>
       item.str.startsWith('TRANSACTION DATE')

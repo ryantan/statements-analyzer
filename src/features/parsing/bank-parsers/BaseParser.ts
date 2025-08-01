@@ -163,7 +163,7 @@ export abstract class BaseBankParser implements BankParser {
       }
 
       const groupString = groupItems
-        .map((item, index) => {
+        .map((item) => {
           if (item.str === ' ') {
             // Recognize long spaces as tabs
             // TODO: Check if there are long spaces where str === '' (which we filtered out earlier).
@@ -230,7 +230,7 @@ export abstract class BaseBankParser implements BankParser {
    * Common method to parse amount from string
    */
   protected parseAmount(amountFormatted: string): number {
-    let amount = 0;
+    let amount: number;
     const withoutCommaBrackets = amountFormatted.replaceAll(/([(),])/g, '');
     if (amountFormatted.startsWith('(')) {
       amount = parseFloat(withoutCommaBrackets);
