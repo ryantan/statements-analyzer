@@ -1,7 +1,6 @@
 'use client';
 
 import { DatePicker } from '@/components';
-import { useCategories } from '@/features/categories/useCategories';
 import { AccountingDateCell } from '@/features/transactions/components/AccountingDateCell';
 import { CategoryCell } from '@/features/transactions/components/CategoryCell';
 import { ManualTransactionForm } from '@/features/transactions/components/ManualTransactionForm';
@@ -56,8 +55,8 @@ const { Search } = Input;
 const { RangePicker } = DatePicker;
 
 export function TransactionsPage() {
-  const { categories } = useCategories();
   const {
+    categories,
     loadTransactions,
     isLoadingTransactions,
     updateTransactionItem,

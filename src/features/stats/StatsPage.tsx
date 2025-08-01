@@ -1,7 +1,6 @@
 'use client';
 
 import { DatePicker } from '@/components';
-import { useCategories } from '@/features/categories/useCategories';
 import { renderBarAxisTick } from '@/features/stats/components/renderBarAxisTick';
 import { renderBarLabel } from '@/features/stats/components/renderBarLabel';
 import { renderBarTooltip } from '@/features/stats/components/renderBarTooltip';
@@ -53,8 +52,7 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 export function StatsPage() {
-  const { categories, categoryMap } = useCategories();
-  const { transactions } = useStore();
+  const { categories, categoryMap, transactions } = useStore();
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
   );

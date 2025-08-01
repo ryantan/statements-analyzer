@@ -1,6 +1,6 @@
 'use client';
 
-import { useCategories } from '@/features/categories/useCategories';
+import { useStore } from '@/store/Store';
 import { useAvailableHeight } from '@/utils/hooks/useAvailableHeight';
 
 import { useState } from 'react';
@@ -25,7 +25,7 @@ const { Title, Paragraph } = Typography;
 const { Search } = Input;
 
 export function CategoriesPage() {
-  const { categories, setCategories } = useCategories();
+  const { categories, setCategories } = useStore();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form] = Form.useForm();

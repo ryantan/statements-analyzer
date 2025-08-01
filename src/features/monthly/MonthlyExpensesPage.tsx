@@ -1,7 +1,6 @@
 'use client';
 
 import { DatePicker } from '@/components';
-import { useCategories } from '@/features/categories/useCategories';
 import { renderStackBarTooltip } from '@/features/monthly/components/renderStackBarTooltip';
 import { useCategoryFilter } from '@/features/monthly/hooks/useCategoryFilter';
 import { useStore } from '@/store/Store';
@@ -39,8 +38,7 @@ interface MonthlyData {
 }
 
 export function MonthlyExpensesPage() {
-  const { categories, categoryMap } = useCategories();
-  const { transactions } = useStore();
+  const { categories, categoryMap, transactions } = useStore();
   const [dateRange, setDateRange] = useState<[Date | null, Date | null] | null>(
     null
   );
