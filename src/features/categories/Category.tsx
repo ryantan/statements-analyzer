@@ -25,7 +25,7 @@ const { Title, Paragraph } = Typography;
 const { Search } = Input;
 
 export function CategoriesPage() {
-  const { categories, setCategories, loadFromLocalStorage } = useCategories();
+  const { categories, setCategories } = useCategories();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form] = Form.useForm();
