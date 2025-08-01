@@ -8,6 +8,7 @@ export const renderStackBarTooltip = ({
   payload?: Array<{
     name: string;
     value: number;
+    fill: string;
     color: string;
   }>;
   label?: string | number;
@@ -28,7 +29,7 @@ export const renderStackBarTooltip = ({
             key={index}
             style={{
               margin: '4px 0',
-              color: entry.color,
+              color: entry.fill,
               display: 'flex',
               justifyContent: 'space-between',
               gap: '20px',
