@@ -1,6 +1,8 @@
 'use client';
 
-import { useTransactions as useTransactionsHook } from '@/features/transactions/hooks/useTransactions';
+import { Category } from '@/features/categories/types';
+import { useCategories } from '@/features/categories/useCategories';
+import { useTransactions } from '@/features/transactions/hooks/useTransactions';
 import {
   Transaction,
   TransactionResolved,
@@ -25,6 +27,11 @@ interface StoreContextType {
   resolvedTransactions: TransactionResolved[];
   // resolvedTransactions, with some ignored items filtered.
   transactions: TransactionResolved[];
+
+  // Categories
+  categories: Category[];
+  categoryMap: Map<string, Category>;
+  setCategories: (categories: Category[]) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -34,6 +41,7 @@ interface StoreProviderProps {
 }
 
 export function StoreProvider({ children }: StoreProviderProps) {
+  const { categories, categoryMap, setCategories } = useCategories();
   const {
     loadFromLocalStorage: loadTransactions,
     loadFromFile,
@@ -45,7 +53,7 @@ export function StoreProvider({ children }: StoreProviderProps) {
     parsedTransactions,
     resolvedTransactions,
     transactions,
-  } = useTransactionsHook();
+  } = useTransactions();
 
   const value: StoreContextType = {
     loadTransactions,
@@ -58,6 +66,10 @@ export function StoreProvider({ children }: StoreProviderProps) {
     parsedTransactions,
     resolvedTransactions,
     transactions,
+
+    categories,
+    categoryMap,
+    setCategories,
   };
 
   return (
