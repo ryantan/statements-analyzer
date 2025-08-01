@@ -1,5 +1,7 @@
 'use client';
 
+import { ReactNode } from 'react';
+
 import { usePathname, useRouter } from 'next/navigation';
 
 import { Menu } from 'antd';
@@ -7,7 +9,7 @@ import { Menu } from 'antd';
 export default function TransactionsLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const pathname = usePathname();
   const router = useRouter();
