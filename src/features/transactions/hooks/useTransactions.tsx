@@ -26,7 +26,7 @@ export const useTransactions = () => {
       console.error(
         'You should not be setting resolved transactions to storage.'
       );
-      message.error(
+      void message.error(
         'You should not be setting resolved transactions to storage.'
       );
       return;
@@ -35,10 +35,10 @@ export const useTransactions = () => {
     _setTransactions(transactions);
     try {
       localStorage.setItem('transactions', JSON.stringify(transactions));
-      message.success('Saved transactions to localStorage');
+      void message.success('Saved transactions to localStorage');
     } catch (error) {
       console.error('Error saving transactions to localStorage:', error);
-      message.error('Failed to save transactions to localStorage');
+      void message.error('Failed to save transactions to localStorage');
     }
   };
 
@@ -71,12 +71,12 @@ export const useTransactions = () => {
     const validTransactions = rawTransactions.filter(isValidTransaction);
     if (validTransactions.length === 0) {
       console.warn('No valid transactions found in the file.');
-      message.warning('No valid transactions found in the file.');
+      void message.warning('No valid transactions found in the file.');
       // return { error: 'No valid transactions found in the file.' };
     }
 
     if (validTransactions.length !== rawTransactions.length) {
-      message.warning(
+      void message.warning(
         `${rawTransactions.length - validTransactions.length} invalid transactions were skipped.`
       );
     }
@@ -100,13 +100,15 @@ export const useTransactions = () => {
         const { error, data: parsedTransactions } =
           parseFromString(storedTransactions);
         if (error) {
-          message.error(error).then();
+          void message.error(error).then();
           console.error(error);
           _setTransactions([]);
           return;
         }
         if (!parsedTransactions) {
-          message.error('Got undefined response from parseFromString').then();
+          void message
+            .error('Got undefined response from parseFromString')
+            .then();
           console.error('Got undefined response from parseFromString');
           _setTransactions([]);
           return;
@@ -116,19 +118,19 @@ export const useTransactions = () => {
         console.log(
           `Loaded ${parsedTransactions.length} transactions from storage`
         );
-        message.success(
+        void message.success(
           `Loaded ${parsedTransactions.length} transactions from storage`
         );
 
         return parsedTransactions;
       } else {
         _setTransactions([]);
-        message.info('No transactions found in localStorage');
+        void message.info('No transactions found in localStorage');
         return [];
       }
     } catch (error) {
       console.error('Error loading transactions:', error);
-      message.error('Failed to load transactions from localStorage');
+      void message.error('Failed to load transactions from localStorage');
       _setTransactions([]);
     } finally {
       setLoading(false);
@@ -139,17 +141,19 @@ export const useTransactions = () => {
     setLoading(true);
     try {
       if (!fileContent) {
-        message.error('Got empty file content').then();
+        void message.error('Got empty file content').then();
         return;
       }
 
       const { error, data: parsedTransactions } = parseFromString(fileContent);
       if (error) {
-        message.error(error).then();
+        void message.error(error).then();
         return;
       }
       if (!parsedTransactions) {
-        message.error('Got undefined response from parseFromString').then();
+        void message
+          .error('Got undefined response from parseFromString')
+          .then();
         return;
       }
 
@@ -165,7 +169,7 @@ export const useTransactions = () => {
         .then();
     } catch (error) {
       console.error('Error loading transactions:', error);
-      message.error('Failed to load transactions from file');
+      void message.error('Failed to load transactions from file');
     } finally {
       setLoading(false);
     }

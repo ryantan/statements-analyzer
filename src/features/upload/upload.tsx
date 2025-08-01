@@ -48,7 +48,7 @@ export function UploadPage() {
     beforeUpload: (file) => {
       const isPDF = file.type === 'application/pdf';
       if (!isPDF) {
-        message.error('You can only upload PDF files!').then();
+        void message.error('You can only upload PDF files!').then();
       }
       return isPDF || Upload.LIST_IGNORE;
     },
@@ -59,7 +59,7 @@ export function UploadPage() {
 
   const handleParsePDF = async () => {
     if (fileList.length === 0) {
-      message.error('Please upload a PDF file first!');
+      void message.error('Please upload a PDF file first!');
       return;
     }
 
@@ -73,7 +73,7 @@ export function UploadPage() {
     for (const fileListItem of fileList) {
       const file = fileListItem.originFileObj;
       if (!file) {
-        message.error('File not found!');
+        void message.error('File not found!');
         return;
       }
       console.log(`Parsing ${file.name}`);
@@ -89,7 +89,7 @@ export function UploadPage() {
         transactions.push(...transactionsOnThisPage);
       } catch (error) {
         console.error('Error parsing PDF:', error);
-        message.error('Failed to parse PDF. Please try again.');
+        void message.error('Failed to parse PDF. Please try again.');
       }
     }
     setTransactions(transactions);
@@ -110,12 +110,12 @@ export function UploadPage() {
 
     existingTransactions.push(...transactions);
     saveTransactions(existingTransactions);
-    message.success('Transactions saved to localStorage!').then();
+    void message.success('Transactions saved to localStorage!').then();
   };
 
   const handleDownloadJSON = () => {
     if (transactions.length === 0) {
-      message.error('No transactions to download!').then();
+      void message.error('No transactions to download!').then();
       return;
     }
 
@@ -130,7 +130,7 @@ export function UploadPage() {
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
 
-    message.success('Transactions downloaded successfully!').then();
+    void message.success('Transactions downloaded successfully!').then();
   };
 
   const columns = [

@@ -40,7 +40,7 @@ export function CategoryCellV2({
   const handleCategorySelect: MenuProps['onClick'] = ({ key }) => {
     const newCategoryKey = key === 'none' ? undefined : key;
     onCategoryChange(transaction.key, newCategoryKey);
-    message.success('Category updated successfully');
+    void message.success('Category updated successfully');
     setIsDropdownOpen(false);
   };
 

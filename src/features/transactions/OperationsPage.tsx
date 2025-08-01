@@ -42,7 +42,9 @@ export function OperationsPage() {
       autoCategoryKey: undefined,
     }));
     setParsedTransactions(newTransactions);
-    message.success('Auto-assigned categories removed from all transactions.');
+    void message.success(
+      'Auto-assigned categories removed from all transactions.'
+    );
   };
 
   const handleAssignCategories = () => {
@@ -52,7 +54,7 @@ export function OperationsPage() {
 
   const handleDownloadJSON = () => {
     if (parsedTransactions.length === 0) {
-      message.error('No transactions to download!');
+      void message.error('No transactions to download!');
       return;
     }
 
@@ -67,7 +69,7 @@ export function OperationsPage() {
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
 
-    message.success('Transactions downloaded successfully!');
+    void message.success('Transactions downloaded successfully!');
   };
 
   const handleImportJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +84,7 @@ export function OperationsPage() {
         const content = e.target?.result as string;
         loadFromFile(content, false);
       } catch (error) {
-        message.error(
+        void message.error(
           'Failed to parse JSON file. Please check the file format.'
         );
         console.error('Import error:', error);
@@ -90,7 +92,7 @@ export function OperationsPage() {
     };
 
     reader.onerror = () => {
-      message.error('Failed to read the file.');
+      void message.error('Failed to read the file.');
     };
 
     reader.readAsText(file);
@@ -111,7 +113,7 @@ export function OperationsPage() {
         const content = e.target?.result as string;
         loadFromFile(content, true);
       } catch (error) {
-        message.error(
+        void message.error(
           'Failed to parse JSON file. Please check the file format.'
         );
         console.error('Import error:', error);
@@ -119,7 +121,7 @@ export function OperationsPage() {
     };
 
     reader.onerror = () => {
-      message.error('Failed to read the file.');
+      void message.error('Failed to read the file.');
     };
 
     reader.readAsText(file);
@@ -151,7 +153,7 @@ export function OperationsPage() {
     });
 
     setParsedTransactions(newTransactions);
-    message.success(
+    void message.success(
       `Updated ${updatedCount} December transactions to year 2024.`
     );
   };
@@ -162,7 +164,7 @@ export function OperationsPage() {
     );
 
     if (manualTransactions.length === 0) {
-      message.warning('No manual transactions found to export!');
+      void message.warning('No manual transactions found to export!');
       return;
     }
 
@@ -178,7 +180,7 @@ export function OperationsPage() {
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
 
-    message.success(
+    void message.success(
       `Exported ${manualTransactions.length} manual transactions successfully!`
     );
   };
