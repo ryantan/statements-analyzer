@@ -10,7 +10,7 @@ export const useCategories = () => {
     localStorage.setItem('categories', JSON.stringify(categories));
   };
 
-  const loadFromLocalStorage = () => {
+  const loadCategories = () => {
     const categories = localStorage.getItem('categories');
     if (categories) {
       setCategories(JSON.parse(categories));
@@ -18,7 +18,7 @@ export const useCategories = () => {
   };
 
   useEffect(() => {
-    loadFromLocalStorage();
+    loadCategories();
   }, []);
 
   const categoryMap = new Map(categories.map((c) => [c.key, c]));
@@ -27,6 +27,6 @@ export const useCategories = () => {
     categories,
     categoryMap,
     setCategories,
-    loadFromLocalStorage,
+    loadCategories,
   };
 };
