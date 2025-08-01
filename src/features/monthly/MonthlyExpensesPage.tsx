@@ -88,7 +88,7 @@ export function MonthlyExpensesPage() {
       ([key]) => key
     );
     return { originalSortedCategories, originalSortedCategoryKeys };
-  }, [filteredTransactions, categoryMap]);
+  }, [filteredTransactions]);
 
   const { visibleCategories, renderCategoriesFilter } = useCategoryFilter(
     categories,
@@ -118,13 +118,7 @@ export function MonthlyExpensesPage() {
       categoryKeysLargestFirst,
       categoryNamesLargestFirst,
     };
-  }, [
-    originalSortedCategories,
-    originalSortedCategoryKeys,
-    filteredTransactions,
-    categoryMap,
-    visibleCategories,
-  ]);
+  }, [originalSortedCategories, categoryMap, visibleCategories]);
 
   // Generate monthly stacked bar data
   const monthlyData = useMemo(() => {
@@ -167,7 +161,7 @@ export function MonthlyExpensesPage() {
 
       return data;
     });
-  }, [filteredTransactions, categoryMap]);
+  }, [filteredTransactions, categoryKeys, categoryMap]);
 
   console.log('monthlyData:', monthlyData);
 
